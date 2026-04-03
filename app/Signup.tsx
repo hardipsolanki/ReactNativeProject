@@ -21,7 +21,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { InputField } from "../components/InputField";
 import { Button } from "../components/Button";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { addUser } from "../utils/auth";
 
 const SignUp = () => {
   const router = useRouter();
@@ -36,6 +37,40 @@ const SignUp = () => {
   });
 
   const arrow = "<";
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [fullNameRequiredError, setFullNaneRequiredError] =
+    useState<string>("");
+  const [emailRequiredError, setEmailRequiredError] = useState<string>("");
+  const [passwordRequiredError, setPasswordRequiredError] =
+    useState<string>("");
+
+  const validation = () => {
+    if (!fieldsData.fullName) {
+      setFullNaneRequiredError("Full name is required");
+    }
+    if (!fieldsData.email) {
+      setPasswordRequiredError("Password is required");
+    }
+    if (!fieldsData.password) {
+      setPasswordRequiredError("Password is required");
+    }
+    return;
+  };
+
+  const handleSignup = async () => {
+    setEmailRequiredError("");
+    setPasswordRequiredError("");
+    validation();
+    try {
+      setLoading(true);
+      addUser({ ...fieldsData, id: new Date() });
+    } catch (error: any) {
+      setError(error?.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={style.conatiner}>
@@ -65,6 +100,7 @@ const SignUp = () => {
                   }))
                 }
                 icon={<UserIcon size={17} color="#888" />}
+                error={fullNameRequiredError}
               />
             </View>
             <View>
@@ -80,6 +116,7 @@ const SignUp = () => {
                 }
                 keyboardType="email-address"
                 icon={<EmailIcon size={17} color="#888" />}
+                error={emailRequiredError}
               />
             </View>
             <View>
@@ -95,13 +132,14 @@ const SignUp = () => {
                 }
                 isPassword
                 icon={<PasswordIcon size={17} color="#888" />}
+                error={passwordRequiredError}
               />
             </View>
           </View>
 
           {/* Signup Button */}
           <View style={style.signupBtnContainer}>
-            <Button onPress={() => {}}>Sign Up</Button>
+            <Button onPress={handleSignup}>Sign Up</Button>
           </View>
         </View>
 
