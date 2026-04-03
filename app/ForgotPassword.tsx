@@ -1,10 +1,5 @@
 import { useRouter } from "expo-router";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { UserIcon } from "../components/Icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { InputField } from "../components/InputField";

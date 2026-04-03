@@ -21,7 +21,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { InputField } from "../components/InputField";
 import { Button } from "../components/Button";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { addUser } from "../utils/auth";
 
 const SignUp = () => {
@@ -64,7 +63,9 @@ const SignUp = () => {
     validation();
     try {
       setLoading(true);
-      addUser({ ...fieldsData, id: new Date() });
+      addUser({ ...fieldsData, id: new Date() })
+        .then(() => router.push("/Login"))
+        .catch((error) => setError(error));
     } catch (error: any) {
       setError(error?.message);
     } finally {
@@ -87,6 +88,12 @@ const SignUp = () => {
       <View style={style.loginFormContainer}>
         <View>
           <Text style={style.LogintText}>Sign Up</Text>
+          {error && (
+            <View style={style.errorMessageConatiner}>
+              <Text style={style.errorMessage}>{error}</Text>
+            </View>
+          )}
+          F
           <View style={style.fieldsGapContainer}>
             <View>
               <InputField
@@ -136,10 +143,11 @@ const SignUp = () => {
               />
             </View>
           </View>
-
           {/* Signup Button */}
           <View style={style.signupBtnContainer}>
-            <Button onPress={handleSignup}>Sign Up</Button>
+            <Button loading={loading} onPress={handleSignup}>
+              Sign Up
+            </Button>
           </View>
         </View>
 
@@ -264,6 +272,14 @@ const style = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     gap: 30,
+  },
+  errorMessageConatiner: {
+    margin: 10,
+  },
+  errorMessage: {
+    color: "red",
+    textAlign: "center",
+    padding: 5,
   },
 });
 

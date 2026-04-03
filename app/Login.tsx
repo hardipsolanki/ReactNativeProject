@@ -20,6 +20,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { InputField } from "../components/InputField";
 import { Button } from "../components/Button";
+import { getUsers } from "../utils/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = () => {
   const router = useRouter();
@@ -48,6 +50,20 @@ const Login = () => {
     validation();
     try {
       setLoading(true);
+      const users = await getUsers();
+      if (users) {
+        const user = users.find((userIn) => userIn.email === email);
+        if (!user) {
+          setError("User not found");
+          return;
+        }
+        if (user.password !== password) {
+          setError("Invalid password");
+          return;
+        }
+        await AsyncStorage.setItem("isLoggedIn", "true");
+        router.push("/Home");
+      }
       // call api
     } catch (error: any) {
       setError(error?.message);

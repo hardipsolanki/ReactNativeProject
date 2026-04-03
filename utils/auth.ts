@@ -28,6 +28,7 @@ const addUser = async (user: User) => {
 
         await AsyncStorage.setItem("users", JSON.stringify(newUsersData))
     } catch (error: any) {
+        console.log("erorr: ", error)
         return error.message
     }
 }
