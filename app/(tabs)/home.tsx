@@ -1,62 +1,133 @@
-// app/(tabs)/home.tsx
-import { View, Text, StyleSheet } from "react-native";
-import { Button } from "../../components/Button";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
+import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { contex } from "../../utils/constant"; // adjust path
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
+import { InputField } from "../../components/InputField";
+import { Button } from "../../components/Button";
+import { TodoContext } from "../../context/TodoContext";
 
-const HomeScreen = () => {
+const TodoScreen = () => {
   const router = useRouter();
-  const [isLoggedIn, setIsLoggesIn] = useState<boolean>(false);
+
+  const { todos } = useContext(TodoContext);
+  console.log("todos: ", todos)
 
   useEffect(() => {
-    const checkLoginStatus = async () => {
-      const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
-
-      if (isLoggedIn !== "true") setIsLoggesIn(false);
-      else setIsLoggesIn(true);
+    const loggedInUser = async () => {
+      try {
+        const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
+        if (isLoggedIn !== "true") {
+          router.replace("/Login");
+        }
+      } catch (error) {
+        console.error("Error fetching logged-in user data:", error);
+      }
     };
-    checkLoginStatus();
+    loggedInUser();
   }, []);
+
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.topContainer}>
-        <Text style={styles.title}>Home Page</Text>
+      <Text style={styles.header}>{contex.tabs.home.heading}</Text>
 
-        <View style={styles.centerContainer}>
-          <Text style={styles.subtitle}>Welcome to the home page...!</Text>
-        </View>
-      </View>
+      <Button style={styles.addBtn} onPress={() => router.push("/addTodo")}>
+        + Add Todo
+      </Button>
+
+      {/* Todo List */}
+      <FlatList
+        data={todos}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.todoItem}>
+            <Text style={styles.todoText}>{item.text}</Text>
+
+            <View style={styles.actions}>
+              <TouchableOpacity style={styles.editBtn}>
+                <Text style={styles.actionText}>
+                  {contex.tabs.home.editIcon}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.deleteBtn}>
+                <Text style={styles.actionText}>
+                  {contex.tabs.home.deleteIcon}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      />
     </SafeAreaView>
   );
 };
 
-export default HomeScreen;
+export default TodoScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginVertical: 50,
+  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+
+  header: {
+    fontSize: 26,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
   },
-  topContainer: {
+
+  addBtn: {
+    backgroundColor: "#007bff",
+    padding: 12,
+    borderRadius: 8,
     alignItems: "center",
+    marginBottom: 15,
   },
-  centerContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 20,
-  },
-  title: {
-    fontSize: 24,
+
+  btnText: {
+    color: "#fff",
     fontWeight: "bold",
   },
-  subtitle: {
+
+  todoItem: {
+    backgroundColor: "#f5f5f5",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
+  todoText: {
+    fontSize: 16,
+    flex: 1,
+  },
+
+  actions: {
+    flexDirection: "row",
+    gap: 10,
+  },
+
+  actionText: {
     fontSize: 18,
-    color: "gray",
+  },
+  editBtn: {
+    padding: 6,
+    backgroundColor: "#e0f7fa",
+    borderRadius: 6,
+  },
+
+  deleteBtn: {
+    padding: 6,
+    backgroundColor: "#ffebee",
+    borderRadius: 6,
   },
 });

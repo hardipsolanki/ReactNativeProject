@@ -12,6 +12,8 @@ type InputFieldProps = {
   isPassword?: boolean;
   keyboardType?: "email-address" | "numeric" | "default";
   error?: string;
+  style?: any;
+  multiline?: boolean;
 };
 
 export const InputField = ({
@@ -23,6 +25,8 @@ export const InputField = ({
   error,
   icon,
   keyboardType = "default",
+  style: customStyle,
+  multiline = false,
 }: InputFieldProps) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -34,11 +38,12 @@ export const InputField = ({
       </View>
       <View>
         <TextInput
-          style={style.input}
+          style={[style.input, customStyle, error && { borderColor: "red" }]}
           placeholder={placeHolder}
           value={value}
           secureTextEntry={isPassword && !showPassword}
           keyboardType={keyboardType}
+          multiline={multiline}
           onChangeText={(text) => onChange(text)}
         />
         {isPassword && (
