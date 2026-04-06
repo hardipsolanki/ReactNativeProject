@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import React, { use, useState } from "react";
+import React, { use, useContext, useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -22,6 +22,7 @@ import { InputField } from "../components/InputField";
 import { Button } from "../components/Button";
 import { getUsers } from "../utils/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { UserContext } from "../context/UserContext";
 
 const Login = () => {
   const router = useRouter();
@@ -32,12 +33,13 @@ const Login = () => {
   const [emailRequiredError, setEmailRequiredError] = useState<string>("");
   const [passwordRequiredError, setPasswordRequiredError] =
     useState<string>("");
+    const {setUser} = useContext(UserContext)
   const arrow = "<";
 
   const validation = () => {
     let isValid = true;
     if (!email) {
-      let isValid = false;
+       isValid = false;
       setEmailRequiredError("Email is required");
     }
     if (!password) {
@@ -65,8 +67,9 @@ const Login = () => {
           setError("Invalid password...!");
           return;
         }
+        setUser(user);
         await AsyncStorage.setItem("isLoggedIn", "true");
-        router.push("/Index");
+        router.push("/home");
       }
     } catch (error: any) {
       console.log("error in login: ", error);
@@ -126,7 +129,11 @@ const Login = () => {
             </TouchableOpacity>
           </View>
           <View>
-            <Button loading={loading} onPress={handleLogin}>
+            <Button
+              loading={loading}
+              onPress={handleLogin}
+              style={style.loginButton}
+            >
               Login
             </Button>
           </View>
@@ -199,6 +206,10 @@ const style = StyleSheet.create({
     color: "#007bff",
     textAlign: "center",
     fontWeight: "bold",
+  },
+  loginButton: {
+    marginTop: 10,
+    backgroundColor: "#0066ff",
   },
 
   bottomContainer: {
