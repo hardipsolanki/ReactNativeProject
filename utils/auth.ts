@@ -48,7 +48,7 @@ const getSingleUser = async (userId: string): Promise<User | string> => {
 
         return user;
     } catch (error: any) {
-        throw error.message;
+        throw error;
     }
 };
 

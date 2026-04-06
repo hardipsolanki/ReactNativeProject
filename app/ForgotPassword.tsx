@@ -1,5 +1,11 @@
 import { useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { UserIcon } from "../components/Icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { InputField } from "../components/InputField";
@@ -64,78 +70,80 @@ const ForgotPassword = () => {
 
   return (
     <SafeAreaView style={style.safeArea}>
-      <View style={style.arrowBtnContainer}>
-        <TouchableOpacity onPress={() => router.push("/Index")}>
-          <Text style={style.arrowBtn}>{arrow}</Text>
-        </TouchableOpacity>
-      </View>
+      <ScrollView>
+        <View style={style.arrowBtnContainer}>
+          <TouchableOpacity onPress={() => router.push("/Index")}>
+            <Text style={style.arrowBtn}>{arrow}</Text>
+          </TouchableOpacity>
+        </View>
 
-      <Text style={style.headingText}>Forgot Password</Text>
+        <Text style={style.headingText}>Forgot Password</Text>
 
-      <View style={style.conatiner}>
-        <View>
-          {/* Description Text */}
-          <View style={style.descriptionContainer}>
-            <Text style={style.descriptionText}>
-              Confirm your email and we'll send
-            </Text>
-            <Text style={style.descriptionText}>the instructions.</Text>
-            {error && (
-              <View style={style.errorMessageConatiner}>
-                <Text style={style.errorMessage}>{error}</Text>
-              </View>
-            )}
-          </View>
-
-          {/* Email Field */}
-          <View style={style.emailFieldContainer}>
-            <View>
-              <InputField
-                label="Your Email"
-                placeHolder="Enter your email"
-                value={email}
-                onChange={(value) => setEmail(value)}
-                keyboardType="email-address"
-                icon={<UserIcon size={17} color="#888" />}
-                error={emailRequiredError}
-              />
+        <View style={style.conatiner}>
+          <View>
+            {/* Description Text */}
+            <View style={style.descriptionContainer}>
+              <Text style={style.descriptionText}>
+                Confirm your email and we'll send
+              </Text>
+              <Text style={style.descriptionText}>the instructions.</Text>
+              {error && (
+                <View style={style.errorMessageConatiner}>
+                  <Text style={style.errorMessage}>{error}</Text>
+                </View>
+              )}
             </View>
-            {isValidEmail && (
+
+            {/* Email Field */}
+            <View style={style.emailFieldContainer}>
               <View>
                 <InputField
-                  label="OTP"
-                  placeHolder="Enter otp"
-                  value={userEnteredOtp}
-                  onChange={(value) => setUserEnteredOtp(value)}
-                  keyboardType="numeric"
+                  label="Your Email"
+                  placeHolder="Enter your email"
+                  value={email}
+                  onChange={(value) => setEmail(value)}
+                  keyboardType="email-address"
                   icon={<UserIcon size={17} color="#888" />}
+                  error={emailRequiredError}
                 />
               </View>
-            )}
+              {isValidEmail && (
+                <View>
+                  <InputField
+                    label="OTP"
+                    placeHolder="Enter otp"
+                    value={userEnteredOtp}
+                    onChange={(value) => setUserEnteredOtp(value)}
+                    keyboardType="numeric"
+                    icon={<UserIcon size={17} color="#888" />}
+                  />
+                </View>
+              )}
+            </View>
+
+            {/* Send Button */}
+            <View style={style.sendBtnContainer}>
+              <Button
+                loading={loading}
+                onPress={
+                  isValidEmail
+                    ? () => verifyOtpHandler(Number(userEnteredOtp))
+                    : verifyEmailHandler
+                }
+              >
+                {isValidEmail ? "Verify" : "Send Reset Instructions"}
+              </Button>
+            </View>
           </View>
 
-          {/* Send Button */}
-          <View style={style.sendBtnContainer}>
-            <Button
-              loading={loading}
-              onPress={
-                isValidEmail
-                  ? () => verifyOtpHandler(Number(userEnteredOtp))
-                  : verifyEmailHandler
-              }
-            >
-              {isValidEmail ? "Verify" : "Send Reset Instructions"}
-            </Button>
+          {/* Bottom Text */}
+          <View>
+            <View style={style.checkEmailContainer}>
+              <Text>Please check your email</Text>
+            </View>
           </View>
         </View>
-
-        {/* Bottom Text */}
-        <View>
-          <View style={style.checkEmailContainer}>
-            <Text>Please check your email</Text>
-          </View>
-        </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
