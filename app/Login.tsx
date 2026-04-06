@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -20,6 +20,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { InputField } from "../components/InputField";
 import { Button } from "../components/Button";
+import { getUsers } from "../utils/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = () => {
   const router = useRouter();
@@ -33,23 +35,41 @@ const Login = () => {
   const arrow = "<";
 
   const validation = () => {
+    let isValid = true;
     if (!email) {
+      let isValid = false;
       setEmailRequiredError("Email is required");
     }
     if (!password) {
+      isValid = false;
       setPasswordRequiredError("Password is required");
     }
-    return;
+    return isValid;
   };
 
   const handleLogin = async () => {
     setEmailRequiredError("");
     setPasswordRequiredError("");
-    validation();
+    const isValid = validation();
+    if (!isValid) return;
     try {
       setLoading(true);
-      // call api
+      const users = await getUsers();
+      if (users?.length) {
+        const user = users.find((user) => user.email === email);
+        if (!user) {
+          setError("User not found...!");
+          return;
+        }
+        if (password !== user.password) {
+          setError("Invalid password...!");
+          return;
+        }
+        await AsyncStorage.setItem("isLoggedIn", "true");
+        router.push("/Index");
+      }
     } catch (error: any) {
+      console.log("error in login: ", error);
       setError(error?.message);
     } finally {
       setLoading(false);

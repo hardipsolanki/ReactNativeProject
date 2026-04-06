@@ -46,26 +46,36 @@ const SignUp = () => {
     useState<string>("");
 
   const validation = () => {
+    let isValid = true;
     if (!fieldsData.fullName) {
+      isValid = false;
       setFullNaneRequiredError("Full name is required");
     }
     if (!fieldsData.email) {
-      setPasswordRequiredError("Password is required");
+      isValid = false;
+
+      setEmailRequiredError("Password is required");
     }
     if (!fieldsData.password) {
+      isValid = false;
+
       setPasswordRequiredError("Password is required");
     }
-    return;
+    return isValid;
   };
 
   const handleSignup = async () => {
+    setFullNaneRequiredError("");
     setEmailRequiredError("");
     setPasswordRequiredError("");
-    validation();
+    const isValid = validation();
+    if (!isValid) return;
     try {
       setLoading(true);
-      addUser({ ...fieldsData, id: new Date() });
+      await addUser({ ...fieldsData, id: new Date().toString() });
+      router.push("/Login");
     } catch (error: any) {
+      console.log("error in signup: ", error);
       setError(error?.message);
     } finally {
       setLoading(false);
@@ -87,6 +97,11 @@ const SignUp = () => {
       <View style={style.loginFormContainer}>
         <View>
           <Text style={style.LogintText}>Sign Up</Text>
+          {error && (
+            <View style={style.errorMessageConatiner}>
+              <Text style={style.errorMessage}>{error}</Text>
+            </View>
+          )}
           <View style={style.fieldsGapContainer}>
             <View>
               <InputField
@@ -139,7 +154,9 @@ const SignUp = () => {
 
           {/* Signup Button */}
           <View style={style.signupBtnContainer}>
-            <Button onPress={handleSignup}>Sign Up</Button>
+            <Button loading={loading} onPress={handleSignup}>
+              Sign Up
+            </Button>
           </View>
         </View>
 
@@ -264,6 +281,14 @@ const style = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     gap: 30,
+  },
+  errorMessageConatiner: {
+    margin: 10,
+  },
+  errorMessage: {
+    color: "red",
+    textAlign: "center",
+    padding: 5,
   },
 });
 

@@ -1,5 +1,6 @@
 import { useRouter } from "expo-router";
 import {
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -10,59 +11,139 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { InputField } from "../components/InputField";
 import { Button } from "../components/Button";
 import { useState } from "react";
+import { getUsers } from "../utils/auth";
+import { generateOtp } from "../utils/otpGenerator";
+import { User } from "../types/user/user";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ForgotPassword = () => {
   const router = useRouter();
   const [email, setEmail] = useState<string>("");
+  const [isValidEmail, setIsValidEmail] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [emailRequiredError, setEmailRequiredError] = useState<string>("");
+  const [userEnteredOtp, setUserEnteredOtp] = useState<string>("");
+  const [otp, setOtp] = useState<number>(0);
   const arrow = "<";
+
+  const validation = () => {
+    if (!email) {
+      setEmailRequiredError("Email is required");
+      return;
+    }
+  };
+
+  const verifyEmailHandler = async () => {
+    try {
+      setEmailRequiredError("");
+      validation();
+      const users = await getUsers();
+      if (users?.length) {
+        const user = users.find((user) => user.email === email);
+        if (!user) {
+          setError("User not found...!");
+          return;
+        }
+        await AsyncStorage.setItem("userId", JSON.stringify(user.id));
+        setIsValidEmail(true);
+        const generatedOtp = generateOtp();
+        console.log(`Your OTP is ${generatedOtp}`);
+        setOtp(generatedOtp);
+      }
+    } catch (error: any) {
+      console.log({ error });
+      setError(error?.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyOtpHandler = (otpByUser: number) => {
+    setEmailRequiredError("");
+    if (otpByUser !== otp) {
+      setError("Invalid OTP...!");
+      return;
+    }
+    router.push("/ResetPassword");
+  };
 
   return (
     <SafeAreaView style={style.safeArea}>
-      <View style={style.arrowBtnContainer}>
-        <TouchableOpacity onPress={() => router.push("/Index")}>
-          <Text style={style.arrowBtn}>{arrow}</Text>
-        </TouchableOpacity>
-      </View>
+      <ScrollView>
+        <View style={style.arrowBtnContainer}>
+          <TouchableOpacity onPress={() => router.push("/Index")}>
+            <Text style={style.arrowBtn}>{arrow}</Text>
+          </TouchableOpacity>
+        </View>
 
-      <Text style={style.headingText}>Forgot Password</Text>
+        <Text style={style.headingText}>Forgot Password</Text>
 
-      <View style={style.conatiner}>
-        <View>
-          {/* Description Text */}
-          <View style={style.descriptionContainer}>
-            <Text style={style.descriptionText}>
-              Confirm your email and we'll send
-            </Text>
-            <Text style={style.descriptionText}>the instructions.</Text>
-          </View>
+        <View style={style.conatiner}>
+          <View>
+            {/* Description Text */}
+            <View style={style.descriptionContainer}>
+              <Text style={style.descriptionText}>
+                Confirm your email and we'll send
+              </Text>
+              <Text style={style.descriptionText}>the instructions.</Text>
+              {error && (
+                <View style={style.errorMessageConatiner}>
+                  <Text style={style.errorMessage}>{error}</Text>
+                </View>
+              )}
+            </View>
 
-          {/* Email Field */}
-          <View style={style.emailFieldContainer}>
-            <View>
-              <InputField
-                label="Your Email"
-                placeHolder="Enter your email"
-                value={email}
-                onChange={(value) => setEmail(value)}
-                keyboardType="email-address"
-                icon={<UserIcon size={17} color="#888" />}
-              />
+            {/* Email Field */}
+            <View style={style.emailFieldContainer}>
+              <View>
+                <InputField
+                  label="Your Email"
+                  placeHolder="Enter your email"
+                  value={email}
+                  onChange={(value) => setEmail(value)}
+                  keyboardType="email-address"
+                  icon={<UserIcon size={17} color="#888" />}
+                  error={emailRequiredError}
+                />
+              </View>
+              {isValidEmail && (
+                <View>
+                  <InputField
+                    label="OTP"
+                    placeHolder="Enter otp"
+                    value={userEnteredOtp}
+                    onChange={(value) => setUserEnteredOtp(value)}
+                    keyboardType="numeric"
+                    icon={<UserIcon size={17} color="#888" />}
+                  />
+                </View>
+              )}
+            </View>
+
+            {/* Send Button */}
+            <View style={style.sendBtnContainer}>
+              <Button
+                loading={loading}
+                onPress={
+                  isValidEmail
+                    ? () => verifyOtpHandler(Number(userEnteredOtp))
+                    : verifyEmailHandler
+                }
+              >
+                {isValidEmail ? "Verify" : "Send Reset Instructions"}
+              </Button>
             </View>
           </View>
 
-          {/* Send Button */}
-          <View style={style.sendBtnContainer}>
-            <Button onPress={() => {}}>Send Reset Instructions</Button>
+          {/* Bottom Text */}
+          <View>
+            <View style={style.checkEmailContainer}>
+              <Text>Please check your email</Text>
+            </View>
           </View>
         </View>
-
-        {/* Bottom Text */}
-        <View>
-          <View style={style.checkEmailContainer}>
-            <Text>Please check your email</Text>
-          </View>
-        </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -148,6 +229,14 @@ const style = StyleSheet.create({
   checkEmailContainer: {
     alignItems: "center",
     marginTop: 40,
+  },
+  errorMessageConatiner: {
+    margin: 10,
+  },
+  errorMessage: {
+    color: "red",
+    textAlign: "center",
+    padding: 5,
   },
 });
 
