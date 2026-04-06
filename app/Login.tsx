@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -35,37 +35,41 @@ const Login = () => {
   const arrow = "<";
 
   const validation = () => {
+    let isValid = true;
     if (!email) {
+      let isValid = false;
       setEmailRequiredError("Email is required");
     }
     if (!password) {
+      isValid = false;
       setPasswordRequiredError("Password is required");
     }
-    return;
+    return isValid;
   };
 
   const handleLogin = async () => {
     setEmailRequiredError("");
     setPasswordRequiredError("");
-    validation();
+    const isValid = validation();
+    if (!isValid) return;
     try {
       setLoading(true);
       const users = await getUsers();
-      if (users) {
-        const user = users.find((userIn) => userIn.email === email);
+      if (users?.length) {
+        const user = users.find((user) => user.email === email);
         if (!user) {
-          setError("User not found");
+          setError("User not found...!");
           return;
         }
-        if (user.password !== password) {
-          setError("Invalid password");
+        if (password !== user.password) {
+          setError("Invalid password...!");
           return;
         }
         await AsyncStorage.setItem("isLoggedIn", "true");
-        router.push("/Home");
+        router.push("/Index");
       }
-      // call api
     } catch (error: any) {
+      console.log("error in login: ", error);
       setError(error?.message);
     } finally {
       setLoading(false);

@@ -21,6 +21,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { InputField } from "../components/InputField";
 import { Button } from "../components/Button";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { addUser } from "../utils/auth";
 
 const SignUp = () => {
@@ -45,28 +46,36 @@ const SignUp = () => {
     useState<string>("");
 
   const validation = () => {
+    let isValid = true;
     if (!fieldsData.fullName) {
+      isValid = false;
       setFullNaneRequiredError("Full name is required");
     }
     if (!fieldsData.email) {
-      setPasswordRequiredError("Password is required");
+      isValid = false;
+
+      setEmailRequiredError("Password is required");
     }
     if (!fieldsData.password) {
+      isValid = false;
+
       setPasswordRequiredError("Password is required");
     }
-    return;
+    return isValid;
   };
 
   const handleSignup = async () => {
+    setFullNaneRequiredError("");
     setEmailRequiredError("");
     setPasswordRequiredError("");
-    validation();
+    const isValid = validation();
+    if (!isValid) return;
     try {
       setLoading(true);
-      addUser({ ...fieldsData, id: new Date() })
-        .then(() => router.push("/Login"))
-        .catch((error) => setError(error));
+      await addUser({ ...fieldsData, id: new Date().toString() });
+      router.push("/Login");
     } catch (error: any) {
+      console.log("error in signup: ", error);
       setError(error?.message);
     } finally {
       setLoading(false);
@@ -93,7 +102,6 @@ const SignUp = () => {
               <Text style={style.errorMessage}>{error}</Text>
             </View>
           )}
-          F
           <View style={style.fieldsGapContainer}>
             <View>
               <InputField
@@ -143,6 +151,7 @@ const SignUp = () => {
               />
             </View>
           </View>
+
           {/* Signup Button */}
           <View style={style.signupBtnContainer}>
             <Button loading={loading} onPress={handleSignup}>

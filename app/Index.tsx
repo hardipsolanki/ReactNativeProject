@@ -1,25 +1,27 @@
 import { Button, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HomeScreen = () => {
   const router = useRouter();
+  const [isLoggedIn, setIsLoggesIn] = useState<boolean>(false);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
       const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
-      if (!isLoggedIn) router.push("/Login");
-    };
 
+      if (isLoggedIn !== "true") setIsLoggesIn(false);
+      else setIsLoggesIn(true);
+    };
     checkLoginStatus();
   }, []);
 
-  const logOutHandler = async () => {
-    await AsyncStorage.removeItem("isLoggedIn");
+  async function logOutHandler() {
+    await AsyncStorage.setItem("isLoggedIn", "false");
     router.push("/Login");
-  };
+  }
 
   return (
     <SafeAreaView
@@ -32,8 +34,6 @@ const HomeScreen = () => {
     >
       <View
         style={{
-          flexDirection: "row",
-          gap: 20,
           alignItems: "center",
         }}
       >
@@ -45,23 +45,41 @@ const HomeScreen = () => {
         >
           Home Page
         </Text>
-        <Button title="Logout" onPress={logOutHandler} />
+        <View style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 20
+        }}>
+          <Text
+            style={{
+              fontSize: 18,
+              color: "gray",
+            }}
+          >
+            Welcome to the home page...!
+          </Text>
+        {isLoggedIn && <Button title="LogOut" onPress={logOutHandler} />}
+
+        </View>
       </View>
-      <View
-        style={{
-          gap: 10,
-          marginTop: 10,
-          marginBottom: 30,
-          flexDirection: "row",
-        }}
-      >
-        <Button title="Login" onPress={() => router.push("/Login")} />
-        <Button title="Sign Up" onPress={() => router.push("/Signup")} />
-        <Button
-          title="Reset Password"
-          onPress={() => router.push("/ResetPassword")}
-        />
-      </View>
+      {!isLoggedIn && (
+        <View
+          style={{
+            gap: 10,
+            marginTop: 10,
+            marginBottom: 30,
+            flexDirection: "row",
+          }}
+        >
+          <Button title="Login" onPress={() => router.push("/Login")} />
+          <Button title="Sign Up" onPress={() => router.push("/Signup")} />
+          <Button
+            title="Reset Password"
+            onPress={() => router.push("/ResetPassword")}
+          />
+        </View>
+      )}
     </SafeAreaView>
   );
 };
