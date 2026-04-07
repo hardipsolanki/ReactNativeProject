@@ -89,7 +89,8 @@ export const contex = {
             titlePlaceholder: "Enter todo title",
             descriptionPlaceholder: "Enter todo description",
             addButton: "Add Todo",
-            requiredErr: "Todo is required",
+            requiredTitleErr: "Todo title required",
+            requiredDescErr: "Todo description is required",
         },
         updateTodo: {
             heading: "Update Todo",
