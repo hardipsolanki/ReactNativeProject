@@ -23,13 +23,20 @@ const TodoScreen = () => {
   const [filteredTodos, setFilteredTodos] = useState(todos);
   const [searchText, setSearchText] = useState("");
   const [applyFilter, setApplyFilter] = useState(contex.tabs.home.status.all);
-  console.log({ todos });
-  console.log("filtered: ", filteredTodos);
-  console.log("aply: ", applyFilter);
   useEffect(() => {
-    if (applyFilter === "all") setFilteredTodos(todos);
-    else setFilteredTodos(todos.filter((t) => t.status === applyFilter));
-  }, [applyFilter, todos]);
+    let filtered = todos;
+    if (applyFilter !== "all") {
+      filtered = filtered.filter((t) => t.status === applyFilter);
+    }
+
+    if (searchText.trim()) {
+      filtered = filtered.filter((t) =>
+        t.title.toLowerCase().includes(searchText.toLowerCase()),
+      );
+    }
+
+    setFilteredTodos(filtered);
+  }, [applyFilter, todos, searchText]);
 
   useEffect(() => {
     const loggedInUser = async () => {
@@ -65,7 +72,6 @@ const TodoScreen = () => {
       <View style={styles.headerContainer}>
         {filters.map((item) => {
           const isActive = applyFilter === item.key;
-
           return (
             <TouchableOpacity
               key={item.key}
@@ -102,7 +108,6 @@ const TodoScreen = () => {
           style={{ backgroundColor: "white" }}
         />
       </View>
-
       <FlatList
         data={filteredTodos}
         keyExtractor={(item) => item.id.toString()}
@@ -120,7 +125,7 @@ const TodoScreen = () => {
                 style={
                   item.status === "completed"
                     ? styles.todoStatsBtn
-                    : styles.todoPendingBtn // optional second style
+                    : styles.todoPendingBtn
                 }
               >
                 <Text
