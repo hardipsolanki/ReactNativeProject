@@ -13,7 +13,8 @@ import {
 import { Todo } from "../types/todo/todo";
 
 const TodoForm = ({ id }: { id?: string }) => {
-  const [error, setError] = useState("");
+  const [titleRedError, setTitleRedError] = useState("");
+  const [decsRedError, setDescrRedError] = useState("");
   const { addTodo } = useContext(TodoContext);
   const router = useRouter();
   const { todos, updateTodo } = useContext(TodoContext);
@@ -27,15 +28,29 @@ const TodoForm = ({ id }: { id?: string }) => {
     description: todo?.description || "",
     status: todo?.status || "pending",
   });
-  const onSubmit = async () => {
-    if (!filedsData.title.trim() || !filedsData.description.trim()) {
-      setError(contex.tabs.addTodo.requiredErr);
-      return;
+
+  const validate = () => {
+    let isValidate = true;
+    if (!filedsData.title.trim()) {
+      setTitleRedError(contex.tabs.addTodo.requiredTitleErr);
+      isValidate = false;
     }
+    if (!filedsData.description.trim()) {
+      setDescrRedError(contex.tabs.addTodo.requiredDescErr);
+      isValidate = false;
+    }
+    return isValidate;
+  };
+
+  const onSubmit = async () => {
+    setTitleRedError("");
+    setDescrRedError("");
+    const isValidate = validate();
+
+    if (!isValidate) return;
 
     if (id) {
       if (!todo) {
-        setError(contex.tabs.updateTodo.notFoundErr);
         return;
       }
       updateTodo({
@@ -87,7 +102,8 @@ const TodoForm = ({ id }: { id?: string }) => {
       } catch (error) {
         console.log("error while adding todo: ", error);
       } finally {
-        setError("");
+        setTitleRedError("");
+        setDescrRedError("");
       }
       router.back();
     }
@@ -103,7 +119,7 @@ const TodoForm = ({ id }: { id?: string }) => {
           onChange={(value) =>
             setFieldsData((prev) => ({ ...prev, title: value }))
           }
-          error={error}
+          error={titleRedError}
         />
       </View>
       <View style={styles.inputFieldsTodoConatiner}>
@@ -114,7 +130,7 @@ const TodoForm = ({ id }: { id?: string }) => {
           onChange={(value) =>
             setFieldsData((prev) => ({ ...prev, description: value }))
           }
-          error={error}
+          error={decsRedError}
           style={{
             lineHeight: 20,
             height: 100,

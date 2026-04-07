@@ -69,48 +69,56 @@ const TodoScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.headerContainer}>
-        {filters.map((item) => {
-          const isActive = applyFilter === item.key;
-          return (
-            <TouchableOpacity
-              key={item.key}
-              style={[
-                styles.addBtn,
-                {
-                  backgroundColor: isActive
-                    ? item.style.backgroundColor
-                    : "#e9e8e8",
-                },
-              ]}
-              onPress={() => setApplyFilter(item.key)}
-            >
-              <Text
-                style={[
-                  styles.btnText,
-                  {
-                    color: isActive ? item.style.color : "#0000004d",
-                  },
-                ]}
-              >
-                {item.key}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-      <View>
-        <InputField
-          label=""
-          placeHolder={contex.tabs.home.searchPlaceholder}
-          value={searchText}
-          onChange={(text) => setSearchText(text)}
-          style={{ backgroundColor: "white" }}
-        />
-      </View>
       <FlatList
         data={filteredTodos}
         keyExtractor={(item) => item.id.toString()}
+        ListHeaderComponent={
+          <View style={styles.stickyHeader}>
+            {/* Filters */}
+            <View style={styles.headerContainer}>
+              {filters.map((item) => {
+                const isActive = applyFilter === item.key;
+
+                return (
+                  <TouchableOpacity
+                    key={item.key}
+                    style={[
+                      styles.addBtn,
+                      {
+                        backgroundColor: isActive
+                          ? item.style.backgroundColor
+                          : "#e9e8e8",
+                      },
+                    ]}
+                    onPress={() => setApplyFilter(item.key)}
+                  >
+                    <Text
+                      style={[
+                        styles.btnText,
+                        {
+                          color: isActive ? item.style.color : "#0000004d",
+                        },
+                      ]}
+                    >
+                      {item.key.charAt(0).toUpperCase() + item.key.slice(1)}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {/* Search */}
+            <InputField
+              label=""
+              placeHolder={contex.tabs.home.searchPlaceholder}
+              value={searchText}
+              onChange={(text) => setSearchText(text)}
+              style={styles.searchInput}
+            />
+          </View>
+        }
+        stickyHeaderIndices={[0]}
+        contentContainerStyle={styles.headerContentStyle}
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => router.push(`/TodoDetail/${item.id}`)}
@@ -122,18 +130,19 @@ const TodoScreen = () => {
               </View>
 
               <View
-                style={
+                style={[
+                  styles.statusBadge,
                   item.status === "completed"
-                    ? styles.todoStatsBtn
-                    : styles.todoPendingBtn
-                }
+                    ? styles.completedBadge
+                    : styles.pendingBadge,
+                ]}
               >
                 <Text
-                  style={[
+                  style={
                     item.status === "completed"
-                      ? styles.statusBtnText
-                      : styles.statusPendingBtnText,
-                  ]}
+                      ? styles.completedText
+                      : styles.pendingText
+                  }
                 >
                   {item.status === "completed" ? "Completed" : "Pending"}
                 </Text>
@@ -141,6 +150,9 @@ const TodoScreen = () => {
             </View>
           </TouchableOpacity>
         )}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>No Todos Found</Text>
+        }
       />
     </SafeAreaView>
   );
@@ -149,87 +161,101 @@ const TodoScreen = () => {
 export default TodoScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#f0f0f0" },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#f0f0f0",
+  },
+  stickyHeader: {
+    backgroundColor: "#f0f0f0", // same as screen
+    paddingBottom: 10,
+    zIndex: 10, // 🔥 prevents overlap
+  },
+
+  searchInput: {
+    backgroundColor: "white",
+    marginTop: 10,
+    borderRadius: 8,
+  },
   headerContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    gap: 10,
+    justifyContent: "space-evenly",
     backgroundColor: "white",
     padding: 10,
     borderRadius: 8,
   },
+  headerContentStyle: {
+    paddingBottom: 20,
+  },
+  addBtn: {
+    paddingVertical: 7,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+  },
+
+  btnText: {
+    fontWeight: "bold",
+  },
+
   todoItem: {
     backgroundColor: "white",
     padding: 15,
     borderRadius: 20,
-    marginBottom: 20,
-    marginTop: 10,
+    marginTop: 15,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  statusPendingBtnText: {
-    color: "#FF4D4D", // red for pending
-    fontWeight: "600",
+
+  todoText: {
+    gap: 6,
+    flex: 1,
   },
-  todoPendingBtn: {
-    backgroundColor: "#FFE5E5", // light red/pink background
+
+  todoTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
+  todoDescription: {
+    fontSize: 13,
+    color: "#555",
+  },
+
+  statusBadge: {
     paddingVertical: 6,
     paddingHorizontal: 12,
-    borderRadius: 4,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
   },
-  todoText: {
-    gap: 6,
-  },
-  todoTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  todoDescription: {
-    fontSize: 14,
-    color: "#555",
-  },
-  todoStatsBtn: {
-    flexDirection: "row",
-    gap: 15,
-    alignItems: "center",
-    padding: 6,
-    borderRadius: 4,
-  },
-  statusBtnText: {
-    color: "white",
+
+  completedBadge: {
+    backgroundColor: "#E6F9F0",
+    borderWidth: 1,
+    borderColor: "#2ECC71",
   },
 
-  header: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 20,
+  pendingBadge: {
+    backgroundColor: "#FFE5E5",
+    borderWidth: 1,
+    borderColor: "#FF4D4D",
+  },
+
+  completedText: {
+    color: "#2ECC71",
+    fontWeight: "600",
+  },
+
+  pendingText: {
+    color: "#FF4D4D",
+    fontWeight: "600",
+  },
+
+  emptyText: {
     textAlign: "center",
-  },
-
-  addBtn: {
-    padding: 7,
-    paddingHorizontal: 30,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-
-  btnText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-
-  editBtn: {
-    padding: 6,
-    backgroundColor: "#e0f7fa",
-    borderRadius: 6,
-  },
-
-  deleteBtn: {
-    padding: 6,
-    backgroundColor: "#ffebee",
-    borderRadius: 6,
+    marginTop: 20,
+    color: "#888",
   },
 });

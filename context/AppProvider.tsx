@@ -29,7 +29,7 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const getTodos = () => todos;
 
   const addTodo = (todo: Todo) => {
-    setTodos((prev) => [...prev, todo]);
+    setTodos((prev) => [todo, ...prev]);
   };
 
   const deleteTodo = (id: string) => {
