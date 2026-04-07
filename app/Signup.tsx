@@ -23,7 +23,7 @@ import { InputField } from "../components/InputField";
 import { Button } from "../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { addUser } from "../utils/auth";
-import { contex } from "../utils/constant";
+import { contex } from "../constant";
 
 const SignUp = () => {
   const router = useRouter();

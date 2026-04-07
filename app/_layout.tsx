@@ -13,6 +13,10 @@ const Layout = () => {
             options={{ title: "Home", headerShown: false }}
           />
           <Stack.Screen
+            name="UpdateTodo"
+            options={{ title: "Update Todo", headerShown: false }}
+          />
+          <Stack.Screen
             name="Login"
             options={{ title: "Login", headerShown: false }}
           />

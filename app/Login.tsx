@@ -23,7 +23,7 @@ import { Button } from "../components/Button";
 import { getUsers } from "../utils/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { UserContext } from "../context/UserContext";
-import { contex } from "../utils/constant";
+import { contex } from "../constant";
 
 const Login = () => {
   const router = useRouter();

@@ -35,6 +35,7 @@ const updateTodo = async (updatedTodo: Todo) => {
     try {
         const todos = await getTodos();
         const findIndex = todos.findIndex((todo: Todo) => todo.id === updatedTodo.id);
+        console.log(findIndex)
         if (findIndex !== -1) {
             todos.splice(findIndex, 1, updatedTodo);
             await AsyncStorage.setItem("todos", JSON.stringify(todos));

@@ -5,21 +5,21 @@ import {
   FlatList,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { contex } from "../../utils/constant"; // adjust path
+import { contex } from "../../constant"; // adjust path
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { InputField } from "../../components/InputField";
 import { Button } from "../../components/Button";
 import { TodoContext } from "../../context/TodoContext";
+import { deleteTodo as deleteTodoAsync } from "../../utils/todo";
 
 const TodoScreen = () => {
   const router = useRouter();
-
-  const { todos } = useContext(TodoContext);
-  console.log("todos: ", todos)
+  const { todos, deleteTodo } = useContext(TodoContext);
 
   useEffect(() => {
     const loggedInUser = async () => {
@@ -35,6 +35,17 @@ const TodoScreen = () => {
     loggedInUser();
   }, []);
 
+  const deleteTodoHandler = async (id: string) => {
+    deleteTodo(id);
+    await deleteTodoAsync(id)
+      .then(() => {
+        console.log("todo deleted successfully");
+        Alert.alert("Success", "Todo deleted successfully");
+      })
+      .catch((error) => {
+        console.log("error while deleting todo: ", error);
+      });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -53,13 +64,24 @@ const TodoScreen = () => {
             <Text style={styles.todoText}>{item.text}</Text>
 
             <View style={styles.actions}>
-              <TouchableOpacity style={styles.editBtn}>
+              <TouchableOpacity
+                onPress={() =>
+                  router.push({
+                    pathname: "/UpdateTodo",
+                    params: { id: item.id, text: item.text },
+                  })
+                }
+                style={styles.editBtn}
+              >
                 <Text style={styles.actionText}>
                   {contex.tabs.home.editIcon}
                 </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.deleteBtn}>
+              <TouchableOpacity
+                onPress={() => deleteTodoHandler(item.id)}
+                style={styles.deleteBtn}
+              >
                 <Text style={styles.actionText}>
                   {contex.tabs.home.deleteIcon}
                 </Text>

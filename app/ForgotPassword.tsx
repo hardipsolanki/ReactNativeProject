@@ -15,7 +15,7 @@ import { getUsers } from "../utils/auth";
 import { generateOtp } from "../utils/otpGenerator";
 import { User } from "../types/user/user";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { contex } from "../utils/constant";
+import { contex } from "../constant";
 
 const ForgotPassword = () => {
   const router = useRouter();

@@ -14,7 +14,7 @@ import { InputField } from "../components/InputField";
 import { Button } from "../components/Button";
 import { getSingleUser, getUsers } from "../utils/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { contex } from "../utils/constant";
+import { contex } from "../constant";
 
 const ResetPassword = () => {
   const [passwordOldRequiredError, setPasswordOldRequiredError] =

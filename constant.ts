@@ -106,6 +106,13 @@ export const contex = {
             addButton: "Add Todo",
 
             requiredErr: "Todo is required",
+        },
+        updateTodo: {
+            heading: "Update Todo",
+
+            updateButton: "Update Todo",
+
+            notFoundErr: "Todo not found...!",
         }
     }
 }

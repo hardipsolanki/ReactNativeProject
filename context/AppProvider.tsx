@@ -5,7 +5,7 @@ import { Todo } from "../types/todo/todo";
 import { getTodos as fetchTodos } from "../utils/todo";
 
 const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // 👤 USER STATE
+  //  USER STATE
   const [user, setUser] = useState<{
     id: string;
     fullName: string;
@@ -24,7 +24,6 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     loadTodos();
   }, []);
 
-  //  USER CONTEXT
   const userValue = useMemo(() => ({ user, setUser }), [user]);
 
   const getTodos = () => todos;
@@ -38,9 +37,11 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   const updateTodo = (updatedTodo: Todo) => {
-    setTodos((prev) =>
-      prev.map((t) => (t.id === updatedTodo.id ? updatedTodo : t)),
-    );
+    const index = todos.findIndex((t) => t.id === updatedTodo.id);
+    if (index !== -1) {
+      todos.splice(index, 1, updatedTodo);
+    }
+    setTodos([...todos]);
   };
 
   const todoValue = useMemo(
