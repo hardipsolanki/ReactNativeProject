@@ -9,12 +9,12 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { EyeIcon, EyeOffIcon, PasswordIcon } from "../components/Icons";
 import { InputField } from "../components/InputField";
 import { Button } from "../components/Button";
 import { getSingleUser, getUsers } from "../utils/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { contex } from "../constant";
+import { contex, ROUTES } from "../constant";
+import { PasswordIcon } from "../components/icons/PasswordIcon";
 
 const ResetPassword = () => {
   const [passwordOldRequiredError, setPasswordOldRequiredError] =
@@ -85,7 +85,7 @@ const ResetPassword = () => {
           await AsyncStorage.setItem("users", JSON.stringify(updatedUsers));
 
           console.log("Password reset successful...!");
-          router.push("/Login");
+          router.push(ROUTES.LOGIN);
         }
       }
     } catch (error) {
@@ -98,7 +98,7 @@ const ResetPassword = () => {
   return (
     <SafeAreaView style={style.conatiner}>
       <View style={style.arrowBtnContainer}>
-        <TouchableOpacity onPress={() => router.push("/Login")}>
+        <TouchableOpacity onPress={() => router.push(ROUTES.LOGIN)}>
           <Text style={style.arrowBtn}>{"<"}</Text>
         </TouchableOpacity>
       </View>

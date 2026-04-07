@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { UserIcon } from "../components/Icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { InputField } from "../components/InputField";
 import { Button } from "../components/Button";
@@ -15,7 +14,8 @@ import { getUsers } from "../utils/auth";
 import { generateOtp } from "../utils/otpGenerator";
 import { User } from "../types/user/user";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { contex } from "../constant";
+import { contex, ROUTES } from "../constant";
+import { UserIcon } from "../components/icons/UserIcon";
 
 const ForgotPassword = () => {
   const router = useRouter();
@@ -77,14 +77,14 @@ const ForgotPassword = () => {
       return;
     }
 
-    router.push("/ResetPassword");
+    router.push(ROUTES.RESET_PASSWORD);
   };
 
   return (
     <SafeAreaView style={style.safeArea}>
       <ScrollView>
         <View style={style.arrowBtnContainer}>
-          <TouchableOpacity onPress={() => router.push("/Login")}>
+          <TouchableOpacity onPress={() => router.push(ROUTES.LOGIN)}>
             <Text style={style.arrowBtn}>{"<"}</Text>
           </TouchableOpacity>
         </View>

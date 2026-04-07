@@ -9,10 +9,9 @@ import {
 } from "react-native";
 import React, { useContext, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { contex } from "../../constant"; // adjust path
+import { contex, ROUTES } from "../../constant"; // adjust path
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import { InputField } from "../../components/InputField";
 import { Button } from "../../components/Button";
 import { TodoContext } from "../../context/TodoContext";
 import { deleteTodo as deleteTodoAsync } from "../../utils/todo";
@@ -26,7 +25,7 @@ const TodoScreen = () => {
       try {
         const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
         if (isLoggedIn !== "true") {
-          router.replace("/Login");
+          router.replace(ROUTES.LOGIN);
         }
       } catch (error) {
         console.error("Error fetching logged-in user data:", error);
@@ -40,7 +39,7 @@ const TodoScreen = () => {
     await deleteTodoAsync(id)
       .then(() => {
         console.log("todo deleted successfully");
-        Alert.alert("Success", "Todo deleted successfully");
+        Alert.alert("Success", contex.tabs.deleteTodo.deleteTodoMsg);
       })
       .catch((error) => {
         console.log("error while deleting todo: ", error);
@@ -51,8 +50,8 @@ const TodoScreen = () => {
     <SafeAreaView style={styles.container}>
       <Text style={styles.header}>{contex.tabs.home.heading}</Text>
 
-      <Button style={styles.addBtn} onPress={() => router.push("/addTodo")}>
-        + Add Todo
+      <Button style={styles.addBtn} onPress={() => router.push(ROUTES.ADD_TODO)}>
+        {contex.tabs.home.addButton}
       </Button>
 
       {/* Todo List */}
@@ -67,7 +66,7 @@ const TodoScreen = () => {
               <TouchableOpacity
                 onPress={() =>
                   router.push({
-                    pathname: "/UpdateTodo",
+                    pathname: ROUTES.UPDATE_TODO,
                     params: { id: item.id, text: item.text },
                   })
                 }

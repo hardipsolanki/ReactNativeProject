@@ -5,6 +5,7 @@ import { UserContext } from "../../context/UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { Button } from "../../components/Button";
+import { contex, ROUTES } from "../../constant";
 
 const Profile = () => {
   const { user } = useContext(UserContext);
@@ -12,12 +13,12 @@ const Profile = () => {
 
   async function logOutHandler() {
     await AsyncStorage.setItem("isLoggedIn", "false");
-    router.push("/Login");
+    router.push(ROUTES.LOGIN);
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.profileText}>Profile</Text>
+      <Text style={styles.profileText}>{contex.tabs.profile.heading}</Text>
       <View style={styles.userDetailsContainer}>
         <View style={styles.userImageContainer}>
           <Image
@@ -28,13 +29,11 @@ const Profile = () => {
         <View style={styles.userInfoContainer}>
           <Text style={styles.userName}>{user?.fullName}</Text>
           <Text style={styles.userEmail}>{user?.email}</Text>
-          <Text style={styles.userBio}>
-            Passionate developer exploring React Native.
-          </Text>
+          <Text style={styles.userBio}>{contex.tabs.profile.about}</Text>
         </View>
 
         <Button onPress={logOutHandler} style={styles.logOutButton}>
-          Log Out
+          {contex.tabs.profile.logoutButton}
         </Button>
       </View>
     </SafeAreaView>
@@ -106,5 +105,5 @@ const styles = StyleSheet.create({
   logOutButton: {
     marginTop: 20,
     backgroundColor: "#ff4d4d",
-  }
+  },
 });

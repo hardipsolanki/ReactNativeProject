@@ -90,11 +90,14 @@ export const contex = {
             defaultBio: "Passionate developer exploring React Native.",
 
             logoutButton: "Log Out",
+
+            about: "  Passionate developer exploring React Native.",
         },
         home: {
             heading: "📝 Todos",
             editIcon: "✏️",
             deleteIcon: "🗑️",
+            addButton: "Add Todo",
 
         },
         addTodo: {
@@ -113,6 +116,21 @@ export const contex = {
             updateButton: "Update Todo",
 
             notFoundErr: "Todo not found...!",
+        },
+        deleteTodo: {
+            deleteTodoMsg: "Todo deleted successfully"
         }
     }
+}
+
+export enum ROUTES {
+  TABS = '(tabs)',
+  HOME = 'home',
+  UPDATE_TODO = 'UpdateTodo',
+  LOGIN = 'Login',
+  SIGNUP = 'Signup',
+  FORGOT_PASSWORD = 'ForgotPassword',
+  RESET_PASSWORD = 'ResetPassword',
+  ADD_TODO = 'addTodo',
+  PROFILE = 'profile'
 }

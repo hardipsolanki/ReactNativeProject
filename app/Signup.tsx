@@ -8,22 +8,19 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  UserIcon,
-  EmailIcon,
-  PasswordIcon,
-  EyeIcon,
-  EyeOffIcon,
-  GoogleIcon,
-  FacebookIcon,
-  XIcon,
-} from "../components/Icons";
+
 import { SafeAreaView } from "react-native-safe-area-context";
 import { InputField } from "../components/InputField";
 import { Button } from "../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { addUser } from "../utils/auth";
-import { contex } from "../constant";
+import { contex, ROUTES } from "../constant";
+import { UserIcon } from "../components/icons/UserIcon";
+import { EmailIcon } from "../components/icons/EmailIcon";
+import { PasswordIcon } from "../components/icons/PasswordIcon";
+import { GoogleIcon } from "../components/icons/GoogleIcon";
+import { FacebookIcon } from "../components/icons/FacebookIcon";
+import { XIcon } from "../components/icons/XIcon";
 
 const SignUp = () => {
   const router = useRouter();
@@ -74,7 +71,7 @@ const SignUp = () => {
     try {
       setLoading(true);
       await addUser({ ...fieldsData, id: new Date().toString() });
-      router.push("/Login");
+      router.push(ROUTES.LOGIN);
     } catch (error: any) {
       console.log("error in signup: ", error);
       setError(error?.message);
@@ -86,7 +83,7 @@ const SignUp = () => {
   return (
     <SafeAreaView style={style.conatiner}>
       <View style={style.arrowBtnContainer}>
-        <TouchableOpacity onPress={() => router.push("/Login")}>
+        <TouchableOpacity onPress={() => router.push(ROUTES.LOGIN)}>
           <Text style={style.arrowBtn}>{"<"}</Text>
         </TouchableOpacity>
       </View>
@@ -148,7 +145,7 @@ const SignUp = () => {
 
         {/* Bottom */}
         <View style={style.bottomContainer}>
-          <TouchableOpacity onPress={() => router.push("/Login")}>
+          <TouchableOpacity onPress={() => router.push(ROUTES.LOGIN)}>
             <View style={style.loginRow}>
               <Text>{contex.signup.loginQuestion}</Text>
               <Text style={style.loginText}>{contex.signup.loginText}</Text>

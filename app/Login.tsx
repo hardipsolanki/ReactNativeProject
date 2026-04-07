@@ -8,22 +8,19 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  UserIcon,
-  PasswordIcon,
-  EyeIcon,
-  EyeOffIcon,
-  FacebookIcon,
-  XIcon,
-  GoogleIcon,
-} from "../components/Icons";
+
 import { SafeAreaView } from "react-native-safe-area-context";
 import { InputField } from "../components/InputField";
 import { Button } from "../components/Button";
 import { getUsers } from "../utils/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { UserContext } from "../context/UserContext";
-import { contex } from "../constant";
+import { contex, ROUTES } from "../constant";
+import { UserIcon } from "../components/icons/UserIcon";
+import { PasswordIcon } from "../components/icons/PasswordIcon";
+import { GoogleIcon } from "../components/icons/GoogleIcon";
+import { FacebookIcon } from "../components/icons/FacebookIcon";
+import { XIcon } from "../components/icons/XIcon";
 
 const Login = () => {
   const router = useRouter();
@@ -80,7 +77,7 @@ const Login = () => {
 
         setUser(user);
         await AsyncStorage.setItem("isLoggedIn", "true");
-        router.replace("/home");
+        router.replace(ROUTES.HOME);
       }
     } catch (error: any) {
       console.log("error in login: ", error);
@@ -93,7 +90,7 @@ const Login = () => {
   return (
     <SafeAreaView style={style.conatiner}>
       <View style={style.arrowBtnContainer}>
-        <TouchableOpacity onPress={() => router.push("/Signup")}>
+        <TouchableOpacity onPress={() => router.push(ROUTES.SIGNUP)}>
           <Text style={style.arrowBtn}>{"<"}</Text>
         </TouchableOpacity>
       </View>
@@ -132,7 +129,7 @@ const Login = () => {
         </View>
 
         <View style={style.forgotPasswordTextConatiner}>
-          <TouchableOpacity onPress={() => router.push("/ForgotPassword")}>
+          <TouchableOpacity onPress={() => router.push(ROUTES.FORGOT_PASSWORD)}>
             <Text style={style.forgotPasswordText}>
               {contex.login.forgotPassword}
             </Text>
@@ -148,7 +145,7 @@ const Login = () => {
         </Button>
 
         <View style={style.bottomContainer}>
-          <TouchableOpacity onPress={() => router.push("/Signup")}>
+          <TouchableOpacity onPress={() => router.push(ROUTES.SIGNUP)}>
             <View style={style.signupRow}>
               <Text>{contex.login.signupQuestion}</Text>
               <Text style={style.signupText}>{contex.login.signupText}</Text>
@@ -234,7 +231,6 @@ const style = StyleSheet.create({
   signupText: {
     color: "#007bff",
     fontWeight: "bold",
-
   },
   socialIconsContainer: {
     flexDirection: "row",

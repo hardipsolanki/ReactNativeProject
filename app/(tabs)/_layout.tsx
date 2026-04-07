@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { ROUTES } from "../../constant";
 
 export default function TabLayout() {
   return (
@@ -9,7 +10,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="home"
+        name={ROUTES.HOME}
         options={{
           title: "Home",
           tabBarIcon: ({ color, size }) => (
@@ -18,7 +19,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="addTodo"
+        name={ROUTES.ADD_TODO}
         options={{
           title: "Todo",
           tabBarIcon: ({ color, size }) => (
@@ -27,7 +28,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name={ROUTES.PROFILE}
         options={{
           title: "Profile",
           tabBarIcon: ({ color, size }) => (

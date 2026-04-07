@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { TextInput } from "react-native";
-import { EyeIcon, EyeOffIcon, PasswordIcon } from "./Icons";
+import { EyeIcon } from "./icons/EyeIcon";
+import { EyeOffIcon } from "./icons/EyeOffIcon";
 
 type InputFieldProps = {
   label: string;
