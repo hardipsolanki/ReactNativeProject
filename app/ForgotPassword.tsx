@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { UserIcon } from "../components/Icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { InputField } from "../components/InputField";
 import { Button } from "../components/Button";
@@ -15,38 +14,49 @@ import { getUsers } from "../utils/auth";
 import { generateOtp } from "../utils/otpGenerator";
 import { User } from "../types/user/user";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { contex, ROUTES } from "../constant";
+import { UserIcon } from "../components/icons/UserIcon";
 
 const ForgotPassword = () => {
   const router = useRouter();
-  const [email, setEmail] = useState<string>("");
-  const [isValidEmail, setIsValidEmail] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-  const [emailRequiredError, setEmailRequiredError] = useState<string>("");
-  const [userEnteredOtp, setUserEnteredOtp] = useState<string>("");
+  const [email, setEmail] = useState("");
+  const [isValidEmail, setIsValidEmail] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [emailRequiredError, setEmailRequiredError] = useState("");
+  const [userEnteredOtp, setUserEnteredOtp] = useState("");
   const [otp, setOtp] = useState<number>(0);
-  const arrow = "<";
 
   const validation = () => {
     if (!email) {
-      setEmailRequiredError("Email is required");
-      return;
+      setEmailRequiredError(contex.forgotPassword.emailRequiredErr);
+      return false;
     }
+    return true;
   };
 
   const verifyEmailHandler = async () => {
     try {
       setEmailRequiredError("");
-      validation();
+      setError("");
+
+      const isValid = validation();
+      if (!isValid) return;
+
       const users = await getUsers();
+
       if (users?.length) {
         const user = users.find((user) => user.email === email);
+
         if (!user) {
-          setError("User not found...!");
+          setError(contex.forgotPassword.userNotFoundErr);
           return;
         }
-        await AsyncStorage.setItem("userId", JSON.stringify(user.id));
+
+        await AsyncStorage.setItem("userId", user.id);
+
         setIsValidEmail(true);
+
         const generatedOtp = generateOtp();
         console.log(`Your OTP is ${generatedOtp}`);
         setOtp(generatedOtp);
@@ -61,32 +71,37 @@ const ForgotPassword = () => {
 
   const verifyOtpHandler = (otpByUser: number) => {
     setEmailRequiredError("");
+
     if (otpByUser !== otp) {
-      setError("Invalid OTP...!");
+      setError(contex.forgotPassword.invalidOtpErr);
       return;
     }
-    router.push("/ResetPassword");
+
+    router.push(ROUTES.RESET_PASSWORD);
   };
 
   return (
     <SafeAreaView style={style.safeArea}>
       <ScrollView>
         <View style={style.arrowBtnContainer}>
-          <TouchableOpacity onPress={() => router.push("/Index")}>
-            <Text style={style.arrowBtn}>{arrow}</Text>
+          <TouchableOpacity onPress={() => router.push(ROUTES.LOGIN)}>
+            <Text style={style.arrowBtn}>{"<"}</Text>
           </TouchableOpacity>
         </View>
 
-        <Text style={style.headingText}>Forgot Password</Text>
+        <Text style={style.headingText}>{contex.forgotPassword.heading}</Text>
 
         <View style={style.conatiner}>
           <View>
-            {/* Description Text */}
+            {/* Description */}
             <View style={style.descriptionContainer}>
               <Text style={style.descriptionText}>
-                Confirm your email and we'll send
+                {contex.forgotPassword.descriptionLine1}
               </Text>
-              <Text style={style.descriptionText}>the instructions.</Text>
+              <Text style={style.descriptionText}>
+                {contex.forgotPassword.descriptionLine2}
+              </Text>
+
               {error && (
                 <View style={style.errorMessageConatiner}>
                   <Text style={style.errorMessage}>{error}</Text>
@@ -94,34 +109,33 @@ const ForgotPassword = () => {
               )}
             </View>
 
-            {/* Email Field */}
+            {/* Email */}
             <View style={style.emailFieldContainer}>
-              <View>
-                <InputField
-                  label="Your Email"
-                  placeHolder="Enter your email"
-                  value={email}
-                  onChange={(value) => setEmail(value)}
-                  keyboardType="email-address"
-                  icon={<UserIcon size={17} color="#888" />}
-                  error={emailRequiredError}
-                />
-              </View>
+              <InputField
+                label={contex.forgotPassword.emailLabel}
+                placeHolder={contex.forgotPassword.emailPlaceholder}
+                value={email}
+                onChange={(value) => setEmail(value)}
+                keyboardType="email-address"
+                icon={<UserIcon size={17} color="#888" />}
+                error={emailRequiredError}
+                style={{ marginBottom: 20 }}
+              />
+
+              {/* OTP */}
               {isValidEmail && (
-                <View>
-                  <InputField
-                    label="OTP"
-                    placeHolder="Enter otp"
-                    value={userEnteredOtp}
-                    onChange={(value) => setUserEnteredOtp(value)}
-                    keyboardType="numeric"
-                    icon={<UserIcon size={17} color="#888" />}
-                  />
-                </View>
+                <InputField
+                  label={contex.forgotPassword.otpLabel}
+                  placeHolder={contex.forgotPassword.otpPlaceholder}
+                  value={userEnteredOtp}
+                  onChange={(value) => setUserEnteredOtp(value)}
+                  keyboardType="numeric"
+                  icon={<UserIcon size={17} color="#888" />}
+                />
               )}
             </View>
 
-            {/* Send Button */}
+            {/* Button */}
             <View style={style.sendBtnContainer}>
               <Button
                 loading={loading}
@@ -131,16 +145,16 @@ const ForgotPassword = () => {
                     : verifyEmailHandler
                 }
               >
-                {isValidEmail ? "Verify" : "Send Reset Instructions"}
+                {isValidEmail
+                  ? contex.forgotPassword.verifyButton
+                  : contex.forgotPassword.sendButton}
               </Button>
             </View>
           </View>
 
-          {/* Bottom Text */}
-          <View>
-            <View style={style.checkEmailContainer}>
-              <Text>Please check your email</Text>
-            </View>
+          {/* Bottom */}
+          <View style={style.checkEmailContainer}>
+            <Text>{contex.forgotPassword.checkEmailText}</Text>
           </View>
         </View>
       </ScrollView>

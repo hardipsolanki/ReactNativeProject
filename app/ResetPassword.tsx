@@ -9,11 +9,12 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { EyeIcon, EyeOffIcon, PasswordIcon } from "../components/Icons";
 import { InputField } from "../components/InputField";
 import { Button } from "../components/Button";
 import { getSingleUser, getUsers } from "../utils/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { contex, ROUTES } from "../constant";
+import { PasswordIcon } from "../components/icons/PasswordIcon";
 
 const ResetPassword = () => {
   const [passwordOldRequiredError, setPasswordOldRequiredError] =
@@ -22,30 +23,35 @@ const ResetPassword = () => {
     useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [fieldsData, setFieldsData] = React.useState<{
-    newPassword: string;
-    confirmPassword: string;
-  }>({
+
+  const [fieldsData, setFieldsData] = useState({
     newPassword: "",
     confirmPassword: "",
   });
+
   const router = useRouter();
-  const arrow = "<";
 
   const validation = () => {
     let isValid = true;
+
     if (!fieldsData.newPassword) {
       isValid = false;
-      setPasswordOldRequiredError("Password is required");
+      setPasswordOldRequiredError(contex.resetPassword.passwordRequiredErr);
     }
+
     if (!fieldsData.confirmPassword) {
       isValid = false;
-      setPasswordConfirmRequiredError("Confirm password is required");
+      setPasswordConfirmRequiredError(
+        contex.resetPassword.confirmPasswordRequiredErr,
+      );
     }
+
     if (fieldsData.newPassword && fieldsData.confirmPassword) {
       if (fieldsData.newPassword !== fieldsData.confirmPassword) {
         isValid = false;
-        setPasswordConfirmRequiredError("Passwords do not match");
+        setPasswordConfirmRequiredError(
+          contex.resetPassword.passwordMismatchErr,
+        );
       }
     }
 
@@ -56,24 +62,30 @@ const ResetPassword = () => {
     setPasswordOldRequiredError("");
     setPasswordConfirmRequiredError("");
     setError("");
+
     const isValid = validation();
     if (!isValid) return;
 
     try {
+      console.log("");
       setLoading(true);
+
       let userId = await AsyncStorage.getItem("userId");
       const users = await getUsers();
       if (users?.length) {
         const userIndex = users.findIndex((user) => user.id === userId);
         if (userIndex !== -1) {
           const updatedUsers = [...users];
+
           updatedUsers[userIndex] = {
             ...users[userIndex],
             password: fieldsData.newPassword,
           };
+
           await AsyncStorage.setItem("users", JSON.stringify(updatedUsers));
+
           console.log("Password reset successful...!");
-          router.push("/Login");
+          router.push(ROUTES.LOGIN);
         }
       }
     } catch (error) {
@@ -86,62 +98,60 @@ const ResetPassword = () => {
   return (
     <SafeAreaView style={style.conatiner}>
       <View style={style.arrowBtnContainer}>
-        <TouchableOpacity onPress={() => router.push("/Index")}>
-          <Text style={style.arrowBtn}>{arrow}</Text>
+        <TouchableOpacity onPress={() => router.push(ROUTES.LOGIN)}>
+          <Text style={style.arrowBtn}>{"<"}</Text>
         </TouchableOpacity>
       </View>
 
       <View style={style.headingContainer}>
-        <Text style={style.headingText}>Reset Password</Text>
+        <Text style={style.headingText}>{contex.resetPassword.heading}</Text>
       </View>
 
       <View style={style.loginFormContainer}>
-        <View>
-          <Text>Change your password to something you can remember</Text>
-          {error && (
-            <View style={style.errorMessageConatiner}>
-              <Text style={style.errorMessage}>{error}</Text>
-            </View>
-          )}
-          <View style={style.fieldsGapContainer}>
-            <View>
-              <InputField
-                label="Your New Password"
-                placeHolder="Enter your new password"
-                value={fieldsData.newPassword}
-                onChange={(value) =>
-                  setFieldsData((prevData) => ({
-                    ...prevData,
-                    newPassword: value,
-                  }))
-                }
-                isPassword
-                error={passwordOldRequiredError}
-                icon={<PasswordIcon size={17} color="#888" />}
-              />
-            </View>
-            <View>
-              <InputField
-                label="Your Confirm Password"
-                placeHolder="Enter your confirm password"
-                value={fieldsData.confirmPassword}
-                onChange={(value) =>
-                  setFieldsData((prevData) => ({
-                    ...prevData,
-                    confirmPassword: value,
-                  }))
-                }
-                isPassword
-                error={passwordConfirmRequiredError}
-                icon={<PasswordIcon size={17} color="#888" />}
-              />
-            </View>
+        <Text>{contex.resetPassword.description}</Text>
+
+        {error && (
+          <View style={style.errorMessageConatiner}>
+            <Text style={style.errorMessage}>{error}</Text>
           </View>
-          <View style={style.resetBtnContainer}>
-            <Button loading={loading} onPress={handleResetPassword}>
-              Reset Password
-            </Button>
-          </View>
+        )}
+
+        <View style={style.fieldsGapContainer}>
+          <InputField
+            label={contex.resetPassword.newPasswordLabel}
+            placeHolder={contex.resetPassword.newPasswordPlaceholder}
+            value={fieldsData.newPassword}
+            onChange={(value) =>
+              setFieldsData((prev) => ({
+                ...prev,
+                newPassword: value,
+              }))
+            }
+            isPassword
+            error={passwordOldRequiredError}
+            icon={<PasswordIcon size={17} color="#888" />}
+          />
+
+          <InputField
+            label={contex.resetPassword.confirmPasswordLabel}
+            placeHolder={contex.resetPassword.confirmPasswordPlaceholder}
+            value={fieldsData.confirmPassword}
+            onChange={(value) =>
+              setFieldsData((prev) => ({
+                ...prev,
+                confirmPassword: value,
+              }))
+            }
+            isPassword
+            error={passwordConfirmRequiredError}
+            icon={<PasswordIcon size={17} color="#888" />}
+          />
+        </View>
+
+        <View style={style.resetBtnContainer}>
+          <Button loading={loading} onPress={handleResetPassword}>
+            {contex.resetPassword.resetButton}
+          </Button>
         </View>
       </View>
     </SafeAreaView>

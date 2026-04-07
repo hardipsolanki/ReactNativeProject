@@ -8,59 +8,54 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  UserIcon,
-  EmailIcon,
-  PasswordIcon,
-  EyeIcon,
-  EyeOffIcon,
-  GoogleIcon,
-  FacebookIcon,
-  XIcon,
-} from "../components/Icons";
+
 import { SafeAreaView } from "react-native-safe-area-context";
 import { InputField } from "../components/InputField";
 import { Button } from "../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { addUser } from "../utils/auth";
+import { contex, ROUTES } from "../constant";
+import { UserIcon } from "../components/icons/UserIcon";
+import { EmailIcon } from "../components/icons/EmailIcon";
+import { PasswordIcon } from "../components/icons/PasswordIcon";
+import { GoogleIcon } from "../components/icons/GoogleIcon";
+import { FacebookIcon } from "../components/icons/FacebookIcon";
+import { XIcon } from "../components/icons/XIcon";
 
 const SignUp = () => {
   const router = useRouter();
-  const [fieldsData, setFieldsData] = useState<{
-    fullName: string;
-    email: string;
-    password: string;
-  }>({
+
+  const [fieldsData, setFieldsData] = useState({
     email: "",
     fullName: "",
     password: "",
   });
 
-  const arrow = "<";
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-  const [fullNameRequiredError, setFullNaneRequiredError] =
-    useState<string>("");
-  const [emailRequiredError, setEmailRequiredError] = useState<string>("");
-  const [passwordRequiredError, setPasswordRequiredError] =
-    useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const [fullNameRequiredError, setFullNaneRequiredError] = useState("");
+  const [emailRequiredError, setEmailRequiredError] = useState("");
+  const [passwordRequiredError, setPasswordRequiredError] = useState("");
 
   const validation = () => {
     let isValid = true;
+
     if (!fieldsData.fullName) {
       isValid = false;
-      setFullNaneRequiredError("Full name is required");
+      setFullNaneRequiredError(contex.signup.fullNameRequiredErr);
     }
+
     if (!fieldsData.email) {
       isValid = false;
-
-      setEmailRequiredError("Password is required");
+      setEmailRequiredError(contex.signup.emailRequiredErr);
     }
+
     if (!fieldsData.password) {
       isValid = false;
-
-      setPasswordRequiredError("Password is required");
+      setPasswordRequiredError(contex.signup.passwordRequiredErr);
     }
+
     return isValid;
   };
 
@@ -68,12 +63,15 @@ const SignUp = () => {
     setFullNaneRequiredError("");
     setEmailRequiredError("");
     setPasswordRequiredError("");
+    setError("");
+
     const isValid = validation();
     if (!isValid) return;
+
     try {
       setLoading(true);
       await addUser({ ...fieldsData, id: new Date().toString() });
-      router.push("/Login");
+      router.push(ROUTES.LOGIN);
     } catch (error: any) {
       console.log("error in signup: ", error);
       setError(error?.message);
@@ -85,91 +83,74 @@ const SignUp = () => {
   return (
     <SafeAreaView style={style.conatiner}>
       <View style={style.arrowBtnContainer}>
-        <TouchableOpacity onPress={() => router.push("/Index")}>
-          <Text style={style.arrowBtn}>{arrow}</Text>
+        <TouchableOpacity onPress={() => router.push(ROUTES.LOGIN)}>
+          <Text style={style.arrowBtn}>{"<"}</Text>
         </TouchableOpacity>
       </View>
 
-      <View>
-        <Text style={style.headingText}>Create Account</Text>
-      </View>
+      <Text style={style.headingText}>{contex.signup.heading}</Text>
 
       <View style={style.loginFormContainer}>
-        <View>
-          <Text style={style.LogintText}>Sign Up</Text>
-          {error && (
-            <View style={style.errorMessageConatiner}>
-              <Text style={style.errorMessage}>{error}</Text>
-            </View>
-          )}
-          <View style={style.fieldsGapContainer}>
-            <View>
-              <InputField
-                label="Your Full Name"
-                placeHolder="Enter your full name"
-                value={fieldsData.fullName}
-                onChange={(value) =>
-                  setFieldsData((prevData) => ({
-                    ...prevData,
-                    fullName: value,
-                  }))
-                }
-                icon={<UserIcon size={17} color="#888" />}
-                error={fullNameRequiredError}
-              />
-            </View>
-            <View>
-              <InputField
-                label="Your Email"
-                placeHolder="Enter your email"
-                value={fieldsData.email}
-                onChange={(value) =>
-                  setFieldsData((prevData) => ({
-                    ...prevData,
-                    email: value,
-                  }))
-                }
-                keyboardType="email-address"
-                icon={<EmailIcon size={17} color="#888" />}
-                error={emailRequiredError}
-              />
-            </View>
-            <View>
-              <InputField
-                label="Your Password"
-                placeHolder="Enter your password"
-                value={fieldsData.password}
-                onChange={(value) =>
-                  setFieldsData((prevData) => ({
-                    ...prevData,
-                    password: value,
-                  }))
-                }
-                isPassword
-                icon={<PasswordIcon size={17} color="#888" />}
-                error={passwordRequiredError}
-              />
-            </View>
-          </View>
+        <Text style={style.LogintText}>{contex.signup.title}</Text>
 
-          {/* Signup Button */}
-          <View style={style.signupBtnContainer}>
-            <Button loading={loading} onPress={handleSignup}>
-              Sign Up
-            </Button>
+        {error && (
+          <View style={style.errorMessageConatiner}>
+            <Text style={style.errorMessage}>{error}</Text>
           </View>
+        )}
+
+        <View style={style.fieldsGapContainer}>
+          <InputField
+            label={contex.signup.fullNameLabel}
+            placeHolder={contex.signup.fullNamePlaceholder}
+            value={fieldsData.fullName}
+            onChange={(value) =>
+              setFieldsData((prev) => ({ ...prev, fullName: value }))
+            }
+            icon={<UserIcon size={17} color="#888" />}
+            error={fullNameRequiredError}
+          />
+
+          <InputField
+            label={contex.signup.emailLabel}
+            placeHolder={contex.signup.emailPlaceholder}
+            value={fieldsData.email}
+            onChange={(value) =>
+              setFieldsData((prev) => ({ ...prev, email: value }))
+            }
+            keyboardType="email-address"
+            icon={<EmailIcon size={17} color="#888" />}
+            error={emailRequiredError}
+          />
+
+          <InputField
+            label={contex.signup.passwordLabel}
+            placeHolder={contex.signup.passwordPlaceholder}
+            value={fieldsData.password}
+            onChange={(value) =>
+              setFieldsData((prev) => ({ ...prev, password: value }))
+            }
+            isPassword
+            icon={<PasswordIcon size={17} color="#888" />}
+            error={passwordRequiredError}
+          />
         </View>
 
-        {/* Bottom Section */}
+        {/* Signup Button */}
+        <View style={style.signupBtnContainer}>
+          <Button loading={loading} onPress={handleSignup}>
+            {contex.signup.signupButton}
+          </Button>
+        </View>
+
+        {/* Bottom */}
         <View style={style.bottomContainer}>
-          <View style={style.loginContainer}>
-            <TouchableOpacity onPress={() => router.push("/Login")}>
-              <View style={style.loginRow}>
-                <Text>Already have an account?</Text>
-                <Text style={style.loginText}>Login</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity onPress={() => router.push(ROUTES.LOGIN)}>
+            <View style={style.loginRow}>
+              <Text>{contex.signup.loginQuestion}</Text>
+              <Text style={style.loginText}>{contex.signup.loginText}</Text>
+            </View>
+          </TouchableOpacity>
 
           <View style={style.socialIconsContainer}>
             <GoogleIcon size={30} />
@@ -272,6 +253,9 @@ const style = StyleSheet.create({
   },
   loginRow: {
     flexDirection: "row",
+    marginVertical: 30,
+    alignItems: "center",
+    justifyContent: "center",
   },
   loginText: {
     color: "#007bff",
