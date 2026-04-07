@@ -39,24 +39,17 @@ const ForgotPassword = () => {
     try {
       setEmailRequiredError("");
       setError("");
-
       const isValid = validation();
       if (!isValid) return;
-
       const users = await getUsers();
-
       if (users?.length) {
         const user = users.find((user) => user.email === email);
-
         if (!user) {
           setError(contex.forgotPassword.userNotFoundErr);
           return;
         }
-
         await AsyncStorage.setItem("userId", user.id);
-
         setIsValidEmail(true);
-
         const generatedOtp = generateOtp();
         console.log(`Your OTP is ${generatedOtp}`);
         setOtp(generatedOtp);
@@ -68,7 +61,6 @@ const ForgotPassword = () => {
       setLoading(false);
     }
   };
-
   const verifyOtpHandler = (otpByUser: number) => {
     setEmailRequiredError("");
 
@@ -76,7 +68,6 @@ const ForgotPassword = () => {
       setError(contex.forgotPassword.invalidOtpErr);
       return;
     }
-
     router.push(ROUTES.RESET_PASSWORD);
   };
 
@@ -88,9 +79,7 @@ const ForgotPassword = () => {
             <Text style={style.arrowBtn}>{"<"}</Text>
           </TouchableOpacity>
         </View>
-
         <Text style={style.headingText}>{contex.forgotPassword.heading}</Text>
-
         <View style={style.conatiner}>
           <View>
             {/* Description */}
@@ -101,14 +90,12 @@ const ForgotPassword = () => {
               <Text style={style.descriptionText}>
                 {contex.forgotPassword.descriptionLine2}
               </Text>
-
               {error && (
                 <View style={style.errorMessageConatiner}>
                   <Text style={style.errorMessage}>{error}</Text>
                 </View>
               )}
             </View>
-
             {/* Email */}
             <View style={style.emailFieldContainer}>
               <InputField
@@ -121,7 +108,6 @@ const ForgotPassword = () => {
                 error={emailRequiredError}
                 style={{ marginBottom: 20 }}
               />
-
               {/* OTP */}
               {isValidEmail && (
                 <InputField
@@ -134,7 +120,6 @@ const ForgotPassword = () => {
                 />
               )}
             </View>
-
             {/* Button */}
             <View style={style.sendBtnContainer}>
               <Button
@@ -151,7 +136,6 @@ const ForgotPassword = () => {
               </Button>
             </View>
           </View>
-
           {/* Bottom */}
           <View style={style.checkEmailContainer}>
             <Text>{contex.forgotPassword.checkEmailText}</Text>

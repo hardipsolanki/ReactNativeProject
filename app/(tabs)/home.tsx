@@ -7,7 +7,7 @@ import {
   TextInput,
   Alert,
 } from "react-native";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { contex, ROUTES } from "../../constant"; // adjust path
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -15,10 +15,21 @@ import { useRouter } from "expo-router";
 import { Button } from "../../components/Button";
 import { TodoContext } from "../../context/TodoContext";
 import { deleteTodo as deleteTodoAsync } from "../../utils/todo";
-
+import { color } from "../../theme";
+import { InputField } from "../../components/InputField";
 const TodoScreen = () => {
   const router = useRouter();
   const { todos, deleteTodo } = useContext(TodoContext);
+  const [filteredTodos, setFilteredTodos] = useState(todos);
+  const [searchText, setSearchText] = useState("");
+  const [applyFilter, setApplyFilter] = useState(contex.tabs.home.status.all);
+  console.log({ todos });
+  console.log("filtered: ", filteredTodos);
+  console.log("aply: ", applyFilter);
+  useEffect(() => {
+    if (applyFilter === "all") setFilteredTodos(todos);
+    else setFilteredTodos(todos.filter((t) => t.status === applyFilter));
+  }, [applyFilter, todos]);
 
   useEffect(() => {
     const loggedInUser = async () => {
@@ -34,59 +45,96 @@ const TodoScreen = () => {
     loggedInUser();
   }, []);
 
-  const deleteTodoHandler = async (id: string) => {
-    deleteTodo(id);
-    await deleteTodoAsync(id)
-      .then(() => {
-        console.log("todo deleted successfully");
-        Alert.alert("Success", contex.tabs.deleteTodo.deleteTodoMsg);
-      })
-      .catch((error) => {
-        console.log("error while deleting todo: ", error);
-      });
-  };
+  const filters = [
+    {
+      key: contex.tabs.home.status.all,
+      style: color.home.filterTodoTextColor.all,
+    },
+    {
+      key: contex.tabs.home.status.completed,
+      style: color.home.filterTodoTextColor.completed,
+    },
+    {
+      key: contex.tabs.home.status.pending,
+      style: color.home.filterTodoTextColor.pending,
+    },
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>{contex.tabs.home.heading}</Text>
+      <View style={styles.headerContainer}>
+        {filters.map((item) => {
+          const isActive = applyFilter === item.key;
 
-      <Button style={styles.addBtn} onPress={() => router.push(ROUTES.ADD_TODO)}>
-        {contex.tabs.home.addButton}
-      </Button>
+          return (
+            <TouchableOpacity
+              key={item.key}
+              style={[
+                styles.addBtn,
+                {
+                  backgroundColor: isActive
+                    ? item.style.backgroundColor
+                    : "#e9e8e8",
+                },
+              ]}
+              onPress={() => setApplyFilter(item.key)}
+            >
+              <Text
+                style={[
+                  styles.btnText,
+                  {
+                    color: isActive ? item.style.color : "#0000004d",
+                  },
+                ]}
+              >
+                {item.key}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+      <View>
+        <InputField
+          label=""
+          placeHolder={contex.tabs.home.searchPlaceholder}
+          value={searchText}
+          onChange={(text) => setSearchText(text)}
+          style={{ backgroundColor: "white" }}
+        />
+      </View>
 
-      {/* Todo List */}
       <FlatList
-        data={todos}
-        keyExtractor={(item) => item.id}
+        data={filteredTodos}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.todoItem}>
-            <Text style={styles.todoText}>{item.text}</Text>
+          <TouchableOpacity
+            onPress={() => router.push(`/TodoDetail/${item.id}`)}
+          >
+            <View style={styles.todoItem}>
+              <View style={styles.todoText}>
+                <Text style={styles.todoTitle}>{item.title}</Text>
+                <Text style={styles.todoDescription}>{item.description}</Text>
+              </View>
 
-            <View style={styles.actions}>
-              <TouchableOpacity
-                onPress={() =>
-                  router.push({
-                    pathname: ROUTES.UPDATE_TODO,
-                    params: { id: item.id, text: item.text },
-                  })
+              <View
+                style={
+                  item.status === "completed"
+                    ? styles.todoStatsBtn
+                    : styles.todoPendingBtn // optional second style
                 }
-                style={styles.editBtn}
               >
-                <Text style={styles.actionText}>
-                  {contex.tabs.home.editIcon}
+                <Text
+                  style={[
+                    item.status === "completed"
+                      ? styles.statusBtnText
+                      : styles.statusPendingBtnText,
+                  ]}
+                >
+                  {item.status === "completed" ? "Completed" : "Pending"}
                 </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => deleteTodoHandler(item.id)}
-                style={styles.deleteBtn}
-              >
-                <Text style={styles.actionText}>
-                  {contex.tabs.home.deleteIcon}
-                </Text>
-              </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
         )}
       />
     </SafeAreaView>
@@ -96,7 +144,58 @@ const TodoScreen = () => {
 export default TodoScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+  container: { flex: 1, padding: 20, backgroundColor: "#f0f0f0" },
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 8,
+  },
+  todoItem: {
+    backgroundColor: "white",
+    padding: 15,
+    borderRadius: 20,
+    marginBottom: 20,
+    marginTop: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  statusPendingBtnText: {
+    color: "#FF4D4D", // red for pending
+    fontWeight: "600",
+  },
+  todoPendingBtn: {
+    backgroundColor: "#FFE5E5", // light red/pink background
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 4,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  todoText: {
+    gap: 6,
+  },
+  todoTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  todoDescription: {
+    fontSize: 14,
+    color: "#555",
+  },
+  todoStatsBtn: {
+    flexDirection: "row",
+    gap: 15,
+    alignItems: "center",
+    padding: 6,
+    borderRadius: 4,
+  },
+  statusBtnText: {
+    color: "white",
+  },
 
   header: {
     fontSize: 26,
@@ -106,11 +205,10 @@ const styles = StyleSheet.create({
   },
 
   addBtn: {
-    backgroundColor: "#007bff",
-    padding: 12,
+    padding: 7,
+    paddingHorizontal: 30,
     borderRadius: 8,
     alignItems: "center",
-    marginBottom: 15,
   },
 
   btnText: {
@@ -118,28 +216,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-  todoItem: {
-    backgroundColor: "#f5f5f5",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-
-  todoText: {
-    fontSize: 16,
-    flex: 1,
-  },
-
-  actions: {
-    flexDirection: "row",
-    gap: 10,
-  },
-
-  actionText: {
-    fontSize: 18,
-  },
   editBtn: {
     padding: 6,
     backgroundColor: "#e0f7fa",

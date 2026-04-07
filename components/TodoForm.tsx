@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useContext, useState } from "react";
-import { contex } from "../constant";
+import React, { useContext, useEffect, useState } from "react";
+import { contex, ROUTES } from "../constant";
 import { InputField } from "./InputField";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Button } from "./Button";
@@ -10,45 +10,68 @@ import {
   addTodo as addTodoToStorage,
   updateTodo as updateTodoAsync,
 } from "../utils/todo";
+import { Todo } from "../types/todo/todo";
 
-const TodoForm = ({ id, text }: { id?: string; text?: string }) => {
-  const [todo, setTodo] = useState(text || "");
+const TodoForm = ({ id }: { id?: string }) => {
   const [error, setError] = useState("");
   const { addTodo } = useContext(TodoContext);
   const router = useRouter();
   const { todos, updateTodo } = useContext(TodoContext);
-
+  const [todo, setTodo] = useState(todos.find((t) => t.id === id));
+  const [filedsData, setFieldsData] = useState<{
+    title: string;
+    description: string;
+    status: "pending" | "completed";
+  }>({
+    title: todo?.title || "",
+    description: todo?.description || "",
+    status: todo?.status || "pending",
+  });
   const onSubmit = async () => {
-    if (!todo) {
+    if (!filedsData.title.trim() || !filedsData.description.trim()) {
       setError(contex.tabs.addTodo.requiredErr);
       return;
     }
 
     if (id) {
-      const existingTodo = todos.find((t) => t.id === id);
-      if (!existingTodo) {
+      if (!todo) {
         setError(contex.tabs.updateTodo.notFoundErr);
         return;
       }
-      updateTodo({ ...existingTodo, text: todo || existingTodo.text });
+      updateTodo({
+        ...todo,
+        title: filedsData.title || todo.title,
+        description: filedsData.description || todo.description,
+      });
       await updateTodoAsync({
-        ...existingTodo,
-        text: todo || existingTodo.text,
+        ...todo,
+        title: filedsData.title || todo.title,
+        description: filedsData.description || todo.description,
       })
         .then(() => {
-          router.back();
-          console.log("todo update successfully: ", existingTodo);
+          router.push(ROUTES.HOME);
+          console.log("todo update successfully: ", todo);
         })
         .catch((error) => {
           console.log("error while updating todo: ", error);
         });
 
-      console.log("todo update successfully: ", existingTodo);
+      console.log("todo update successfully: ", todo);
       return;
     } else {
       try {
-        addTodo({ id: Date.now().toString(), text: todo });
-        await addTodoToStorage({ id: Date.now().toString(), text: todo })
+        addTodo({
+          id: Date.now().toString(),
+          title: filedsData.title,
+          description: filedsData.description,
+          status: filedsData.status,
+        });
+        await addTodoToStorage({
+          id: Date.now().toString(),
+          title: filedsData.title,
+          description: filedsData.description,
+          status: filedsData.status,
+        })
           .then(() => {
             console.log("todo added successfully");
           })
@@ -56,7 +79,11 @@ const TodoForm = ({ id, text }: { id?: string; text?: string }) => {
             console.log("error while adding todo: ", error);
           });
 
-        setTodo("");
+        setFieldsData({
+          title: "",
+          description: "",
+          status: "pending",
+        });
       } catch (error) {
         console.log("error while adding todo: ", error);
       } finally {
@@ -70,19 +97,29 @@ const TodoForm = ({ id, text }: { id?: string; text?: string }) => {
     <View style={styles.container}>
       <View style={styles.inputFieldsTodoConatiner}>
         <InputField
-          label={contex.tabs.addTodo.inputLabel}
-          placeHolder={contex.tabs.addTodo.inputPlaceholder}
-          value={todo}
-          onChange={setTodo}
-          icon={
-            <Ionicons
-              name="pencil"
-              size={20}
-              color={"#2926268c"}
-              style={{ marginRight: 8 }}
-            />
+          label={contex.tabs.addTodo.title}
+          placeHolder={contex.tabs.addTodo.titlePlaceholder}
+          value={filedsData.title}
+          onChange={(value) =>
+            setFieldsData((prev) => ({ ...prev, title: value }))
           }
           error={error}
+        />
+      </View>
+      <View style={styles.inputFieldsTodoConatiner}>
+        <InputField
+          label={contex.tabs.addTodo.Description}
+          placeHolder={contex.tabs.addTodo.descriptionPlaceholder}
+          value={filedsData.description}
+          onChange={(value) =>
+            setFieldsData((prev) => ({ ...prev, description: value }))
+          }
+          error={error}
+          style={{
+            lineHeight: 20,
+            height: 100,
+            textAlignVertical: "top",
+          }}
         />
       </View>
       <View style={styles.button}>

@@ -1,4 +1,6 @@
 export interface Todo {
     id: string;
-    text: string;
+    title: string;
+    description: string;
+    status: "pending" | "completed";
 }

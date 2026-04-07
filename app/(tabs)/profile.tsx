@@ -31,7 +31,6 @@ const Profile = () => {
           <Text style={styles.userEmail}>{user?.email}</Text>
           <Text style={styles.userBio}>{contex.tabs.profile.about}</Text>
         </View>
-
         <Button onPress={logOutHandler} style={styles.logOutButton}>
           {contex.tabs.profile.logoutButton}
         </Button>

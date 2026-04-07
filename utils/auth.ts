@@ -4,11 +4,9 @@ import { User } from "../types/user/user";
 const getUsers = async (): Promise<User[] | null> => {
     try {
         const users = await AsyncStorage.getItem("users");
-
         if (users !== null) {
             return JSON.parse(users) as User[];
         }
-
         return null;
     } catch (error) {
         console.log(error);
@@ -22,15 +20,11 @@ const addUser = async (user: User) => {
         if (users?.length) {
             const isUserExist = users?.find((userIn) => userIn.email === user.email);
             if (isUserExist) throw new Error("User is already exist");
-
             const newUsersData = users?.push(user);
-
             await AsyncStorage.setItem("users", JSON.stringify(newUsersData));
         } else {
             let users: Array<User> = [];
-
             users.push(user);
-
             await AsyncStorage.setItem("users", JSON.stringify(users));
         }
     } catch (error: any) {
@@ -41,11 +35,8 @@ const addUser = async (user: User) => {
 const getSingleUser = async (userId: string): Promise<User | string> => {
     try {
         const users = await getUsers();
-
         const user = users?.find((userIn) => userIn.id === userId);
-
         if (!user) throw new Error("User not found");
-
         return user;
     } catch (error: any) {
         throw error;

@@ -31,22 +31,18 @@ const Login = () => {
   const [emailRequiredError, setEmailRequiredError] = useState<string>("");
   const [passwordRequiredError, setPasswordRequiredError] =
     useState<string>("");
-
   const { setUser } = useContext(UserContext);
 
   const validation = () => {
     let isValid = true;
-
     if (!email) {
       isValid = false;
       setEmailRequiredError(contex.login.emailRequiredErr);
     }
-
     if (!password) {
       isValid = false;
       setPasswordRequiredError(contex.login.passwordRequiredErr);
     }
-
     return isValid;
   };
 
@@ -54,14 +50,12 @@ const Login = () => {
     setEmailRequiredError("");
     setPasswordRequiredError("");
     setError("");
-
     const isValid = validation();
     if (!isValid) return;
 
     try {
       setLoading(true);
       const users = await getUsers();
-
       if (users?.length) {
         const user = users.find((user) => user.email === email);
 
@@ -69,12 +63,10 @@ const Login = () => {
           setError(contex.login.userNotFoundErr);
           return;
         }
-
         if (password !== user.password) {
           setError(contex.login.invalidPasswordErr);
           return;
         }
-
         setUser(user);
         await AsyncStorage.setItem("isLoggedIn", "true");
         router.replace(ROUTES.HOME);
@@ -94,18 +86,14 @@ const Login = () => {
           <Text style={style.arrowBtn}>{"<"}</Text>
         </TouchableOpacity>
       </View>
-
       <Text style={style.headingText}>{contex.login.heading}</Text>
-
       <View style={style.loginFormContainer}>
         <Text style={style.LogintText}>{contex.login.title}</Text>
-
         {error && (
           <View style={style.errorMessageConatiner}>
             <Text style={style.errorMessage}>{error}</Text>
           </View>
         )}
-
         <View style={style.loginFieldsContainer}>
           <InputField
             label={contex.login.emailLabel}
@@ -116,7 +104,6 @@ const Login = () => {
             error={emailRequiredError}
             icon={<UserIcon size={17} color="#888" />}
           />
-
           <InputField
             label={contex.login.passwordLabel}
             placeHolder={contex.login.passwordPlaceholder}
@@ -127,7 +114,6 @@ const Login = () => {
             icon={<PasswordIcon size={17} color="#888" />}
           />
         </View>
-
         <View style={style.forgotPasswordTextConatiner}>
           <TouchableOpacity onPress={() => router.push(ROUTES.FORGOT_PASSWORD)}>
             <Text style={style.forgotPasswordText}>
@@ -135,7 +121,6 @@ const Login = () => {
             </Text>
           </TouchableOpacity>
         </View>
-
         <Button
           loading={loading}
           onPress={handleLogin}
@@ -143,7 +128,6 @@ const Login = () => {
         >
           {contex.login.loginButton}
         </Button>
-
         <View style={style.bottomContainer}>
           <TouchableOpacity onPress={() => router.push(ROUTES.SIGNUP)}>
             <View style={style.signupRow}>
@@ -151,7 +135,6 @@ const Login = () => {
               <Text style={style.signupText}>{contex.login.signupText}</Text>
             </View>
           </TouchableOpacity>
-
           <View style={style.socialIconsContainer}>
             <GoogleIcon size={30} />
             <FacebookIcon size={30} />
