@@ -96,6 +96,9 @@ export const contex = {
             heading: "Update Todo",
             updateButton: "Update Todo",
             notFoundErr: "Todo not found...!",
+            TOGGLE_WIDTH: 70,
+            BALL_SIZE: 22,
+            PADDING: 4,
         },
         deleteTodo: {
             deleteTodoMsg: "Todo deleted successfully",
@@ -113,5 +116,6 @@ export enum ROUTES {
     FORGOT_PASSWORD = 'ForgotPassword',
     RESET_PASSWORD = 'ResetPassword',
     ADD_TODO = 'addTodo',
-    PROFILE = 'profile'
+    PROFILE = 'profile',
+    SingleTodoPage = "TodoDetail/[id]"
 }

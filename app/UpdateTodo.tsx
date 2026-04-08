@@ -4,6 +4,7 @@ import { useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TodoForm from "../components/TodoForm";
 import { contex } from "../constant";
+import CustomHeader from "../components/CustomHeader";
 
 const updateTodo = () => {
   const { id } = useLocalSearchParams();
@@ -12,8 +13,10 @@ const updateTodo = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>{contex.tabs.updateTodo.heading}</Text>
-      <TodoForm id={normalizedId} />
+      <CustomHeader title="Update Todo" />
+      <View style={styles.updateTodoContainer}>
+        <TodoForm id={normalizedId} />
+      </View>
     </SafeAreaView>
   );
 };
@@ -32,5 +35,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
+  },
+  updateTodoContainer: {
+    width: "100%",
+    paddingTop: 20,
+    marginTop: 30,
   },
 });

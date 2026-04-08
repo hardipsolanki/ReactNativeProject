@@ -2,16 +2,16 @@ export const color = {
     home: {
         filterTodoTextColor: {
             all: {
-                backgroundColor: "#E3F2FD",
-                color: "#2196F3",
+                backgroundColor: "#2320df",
+                color: "white",
             },
             completed: {
-                backgroundColor: "#E6F9F0",
-                color: "#2ECC71",
+                backgroundColor: "#2320df",
+                color: "white",
             },
             pending: {
-                backgroundColor: "#FFF4E5",
-                color: "#F39C12",
+                backgroundColor: "#2320df",
+                color: "white",
             },
         }
     },
