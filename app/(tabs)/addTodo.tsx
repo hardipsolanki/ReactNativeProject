@@ -1,14 +1,21 @@
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { contex } from "../../constant";
 import TodoForm from "../../components/TodoForm";
+import CustomHeader from "../../components/CustomHeader";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const AddTodo = () => {
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>{contex.tabs.addTodo.heading}</Text>
-      <TodoForm />
+      <CustomHeader
+        Icon={<Ionicons name="add" size={24} color="black" />}
+        title="Add Task"
+      />
+      <View style={styles.addTodoConatainer}>
+        <TodoForm />
+      </View>
     </SafeAreaView>
   );
 };
@@ -17,16 +24,12 @@ export default AddTodo;
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    
+    // justifyContent: "center",
+    // alignItems: "center",
+    // padding: 20,
   },
-
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
+  addTodoConatainer: {
+    paddingTop: 20,
+    marginTop: 30,
   },
 });

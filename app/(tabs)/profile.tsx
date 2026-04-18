@@ -6,6 +6,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { Button } from "../../components/Button";
 import { contex, ROUTES } from "../../constant";
+import CustomHeader from "../../components/CustomHeader";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const Profile = () => {
   const { user } = useContext(UserContext);
@@ -18,22 +20,27 @@ const Profile = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.profileText}>{contex.tabs.profile.heading}</Text>
-      <View style={styles.userDetailsContainer}>
-        <View style={styles.userImageContainer}>
-          <Image
-            style={styles.userAvatar}
-            source={require("../../assets/userAvatar.jpg")}
-          />
+      <CustomHeader
+        Icon={<Ionicons name="settings" size={24} color="black" />}
+        title="Profile"
+      />
+      <View style={styles.profileSectionContainer}>
+        <View style={styles.userDetailsContainer}>
+          <View style={styles.userImageContainer}>
+            <Image
+              style={styles.userAvatar}
+              source={require("../../assets/userAvatar.jpg")}
+            />
+          </View>
+          <View style={styles.userInfoContainer}>
+            <Text style={styles.userName}>{user?.fullName}</Text>
+            <Text style={styles.userEmail}>{user?.email}</Text>
+            <Text style={styles.userBio}>{contex.tabs.profile.about}</Text>
+          </View>
+          <Button onPress={logOutHandler} style={styles.logOutButton}>
+            {contex.tabs.profile.logoutButton}
+          </Button>
         </View>
-        <View style={styles.userInfoContainer}>
-          <Text style={styles.userName}>{user?.fullName}</Text>
-          <Text style={styles.userEmail}>{user?.email}</Text>
-          <Text style={styles.userBio}>{contex.tabs.profile.about}</Text>
-        </View>
-        <Button onPress={logOutHandler} style={styles.logOutButton}>
-          {contex.tabs.profile.logoutButton}
-        </Button>
       </View>
     </SafeAreaView>
   );
@@ -45,8 +52,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    marginVertical: 50,
+    // marginVertical: 50,
     backgroundColor: "#f5f5f5",
+  },
+  profileSectionContainer: {
+    paddingTop: 20,
+    marginTop: 30,
   },
   profileText: {
     fontSize: 28,
@@ -102,6 +113,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   logOutButton: {
+    width: "100%",
     marginTop: 20,
     backgroundColor: "#ff4d4d",
   },

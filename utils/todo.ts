@@ -14,7 +14,7 @@ const getTodos = async (): Promise<Todo[]> => {
 const addTodo = async (todo: Todo) => {
     try {
         const todos = await getTodos();
-        todos.push(todo);
+        todos.unshift(todo);
         await AsyncStorage.setItem("todos", JSON.stringify(todos));
     } catch (error) {
         throw error;

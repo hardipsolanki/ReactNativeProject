@@ -33,6 +33,10 @@ const Layout = () => {
             name={ROUTES.RESET_PASSWORD}
             options={{ title: "Reset Password", headerShown: false }}
           />
+          <Stack.Screen
+            name={ROUTES.SingleTodoPage}
+            options={{ headerShown: false }}
+          />
         </Stack>
       </AppProvider>
     </SafeAreaProvider>
